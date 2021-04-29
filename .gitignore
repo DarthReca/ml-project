@@ -1,1 +1,4 @@
+#Ignore spyder folder
 /.spyproject
+#Ignore python cache
+/**/__pycache__
