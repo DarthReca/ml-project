@@ -1,0 +1,1 @@
+"""Used to load data in a comfortable format."""
