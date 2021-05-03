@@ -5,6 +5,7 @@ import data_loading as dl
 def main() -> None:
     """Only main."""
     test_data = dl.load_test_data()
+    labels_name = dl.labels_name
     # TODO: use main
 
 if __name__ == '__main__':

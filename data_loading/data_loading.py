@@ -11,6 +11,27 @@ from typing import Tuple
 
 path = Path(__file__)
 
+"""
+1. Mean of the integrated profile.
+2. Standard deviation of the integrated profile.
+3. Excess kurtosis of the integrated profile.
+4. Skewness of the integrated profile.
+5. Mean of the DM-SNR curve.
+6. Standard deviation of the DM-SNR curve.
+7. Excess kurtosis of the DM-SNR curve.
+8. Skewness of the DM-SNR curve.
+"""
+labels_name = [
+    "mean ip",
+    "standard deviation ip",
+    "excess kurtosis ip",
+    "skewness ip",
+    "mean ds",
+    "standard deviation ds",
+    "excess kurtosis ds",
+    "skewness ds"
+]
+
 def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
     """
     Load training data.
@@ -26,7 +47,7 @@ def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
     """
     
     dataset = np.loadtxt(path.with_name("Train.txt"), delimiter=",")
-    return dataset[:, :-2].T, dataset[:, -1]
+    return dataset[:, :-1].T, dataset[:, -1]
 
 def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -42,4 +63,4 @@ def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
 
     """
     dataset = np.loadtxt(path.with_name("Test.txt"), delimiter=",")
-    return dataset[:, :-2].T, dataset[:, -1]
+    return dataset[:, :-1].T, dataset[:, -1]
