@@ -11,8 +11,6 @@ from typing import Tuple
 
 path = Path(__file__)
 
-<<<<<<< Updated upstream
-=======
 """
 1. Mean of the integrated profile.
 2. Standard deviation of the integrated profile.
@@ -34,7 +32,7 @@ labels_name = [
     "skewness ds"
 ]
 
->>>>>>> Stashed changes
+
 def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
     """
     Load training data.
@@ -48,13 +46,10 @@ def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
         Array of labels with dimension (n, )
 
     """
-    
+
     dataset = np.loadtxt(path.with_name("Train.txt"), delimiter=",")
-<<<<<<< Updated upstream
-    return dataset[:, :-2].T, dataset[:, -1]
-=======
     return dataset[:, :-1].T, dataset[:, -1]
->>>>>>> Stashed changes
+
 
 def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -70,8 +65,4 @@ def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
 
     """
     dataset = np.loadtxt(path.with_name("Test.txt"), delimiter=",")
-<<<<<<< Updated upstream
-    return dataset[:, :-2].T, dataset[:, -1]
-=======
     return dataset[:, :-1].T, dataset[:, -1]
->>>>>>> Stashed changes
