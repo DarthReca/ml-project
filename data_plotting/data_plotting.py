@@ -10,11 +10,9 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 import data_loading as dl
 
 sys.path.append("..")
-
 
 def plot_attributes(data: pd.DataFrame):
 
