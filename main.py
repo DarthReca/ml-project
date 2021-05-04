@@ -1,4 +1,5 @@
 import numpy as np
+
 import data_loading as dl
 import data_plotting as pt
 
@@ -7,10 +8,8 @@ import data_plotting as pt
 
 def main() -> None:
     """Only main."""
-    test_data = dl.load_test_data()
-    labels_name = dl.labels_name
-    plot_data = pt.plot_test_data()
-    labels_name = dl.labels_name
+    train_data = dl.load_train_data()
+    plot_data = pt.plot_attributes(train_data)
     # TODO: use main
 
 

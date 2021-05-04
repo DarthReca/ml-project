@@ -7,5 +7,6 @@ Created on Mon May  3 10:31:22 2021
 
 import numpy as np
 
+
 def k_fold(data: np.ndarray, k: int):
     pass

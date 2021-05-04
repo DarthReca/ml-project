@@ -5,64 +5,52 @@ Created on Mon May  3 09:36:57 2021
 @author: darth
 """
 
-import numpy as np
 from pathlib import Path
 from typing import Tuple
 
+import numpy as np
+import pandas as pd
+
 path = Path(__file__)
 
-"""
-1. Mean of the integrated profile.
-2. Standard deviation of the integrated profile.
-3. Excess kurtosis of the integrated profile.
-4. Skewness of the integrated profile.
-5. Mean of the DM-SNR curve.
-6. Standard deviation of the DM-SNR curve.
-7. Excess kurtosis of the DM-SNR curve.
-8. Skewness of the DM-SNR curve.
-"""
-labels_name = [
-    "mean ip",
-    "standard deviation ip",
-    "excess kurtosis ip",
-    "skewness ip",
-    "mean ds",
-    "standard deviation ds",
-    "excess kurtosis ds",
-    "skewness ds"
+column_names = [
+    "Mean of the integrated profile",
+    "Standard deviation of the integrated profile",
+    "Excess kurtosis of the integrated profile",
+    "Skewness of the integrated profile",
+    "Mean of the DM-SNR curve",
+    "Standard deviation of the DM-SNR curve",
+    "Excess kurtosis of the DM-SNR curve",
+    "Skewness of the DM-SNR curve",
+    "Class"
 ]
 
 
-def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
+def load_train_data() -> pd.DataFrame:
     """
-    Load training data.
+    Load training data as Dataframe.
 
     Returns
     -------
-    data: ndarray
-        Rows represent attributes, Column samples
-        Dimension (a, s) where a is attributes count, s is samples count.
-    labels: ndarray
-        Array of labels with dimension (n, )
-
+    dataset : DataFrame
     """
+    dataset = pd.read_csv(
+        path.with_name("Train.txt"),
+        names=column_names,
+        index_col=False)
+    return dataset
 
-    dataset = np.loadtxt(path.with_name("Train.txt"), delimiter=",")
-    return dataset[:, :-1].T, dataset[:, -1]
 
-
-def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
+def load_test_data() -> pd.DataFrame:
     """
-    Load test data.
+    Load test data as Dataframe.
 
     Returns
     -------
-    data: ndarray
-        Rows represent attributes, Column samples
-        Dimension (a, s) where a is attributes count, s is samples count.
-    labels: ndarray
-        Array of labels with dimension (n, )
+    dataset : DataFrame
 
     """
-    dataset = np.loadtxt(path.with_name("Test.txt"), delimiter=",")
-    return dataset[:, :-1].T, dataset[:, -1]
+    dataset = pd.read_csv(path.with_name("Test.txt"),
+                          names=column_names,
+                          index_col=False)
+    return dataset
