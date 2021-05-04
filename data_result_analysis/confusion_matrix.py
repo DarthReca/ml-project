@@ -7,6 +7,7 @@ Created on Tue May  4 21:16:11 2021
 
 import numpy as np
 
+
 def confusion_matrix(
         true_labels: np.ndarray,
         predicted_labels: np.ndarray
@@ -26,10 +27,10 @@ def confusion_matrix(
     confusion_matrix : ndarray
         elemnt[i, j] is predicted as part of i class, but its class is j
     """
-    #To be sure we have 1-D array
+    # To be sure we have 1-D array
     true_labels = true_labels.flatten()
     predicted_labels = predicted_labels.flatten()
-    
+
     labels_count = np.amax(true_labels).item() + 1
     conf_mat = np.empty([labels_count, labels_count], dtype=np.int32)
     for pred in range(labels_count):
@@ -38,4 +39,3 @@ def confusion_matrix(
             pl = predicted_labels == pred
             conf_mat[pred][real] = np.logical_and(tl, pl).sum()
     return conf_mat
-    
