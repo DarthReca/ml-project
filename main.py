@@ -4,8 +4,6 @@ import data_loading as dl
 import data_plotting as pt
 
 """Used to display results."""
-
-
 def main() -> None:
     """Only main."""
     train_data = dl.load_train_data()

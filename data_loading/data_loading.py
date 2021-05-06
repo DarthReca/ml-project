@@ -9,11 +9,10 @@ from pathlib import Path
 from typing import Tuple
 
 import numpy as np
-import pandas as pd
 
 path = Path(__file__)
 
-column_names = [
+labels_names = [
     "Integrated profile mean",
     "Integrated profile SD",
     "Integrated profile EK",
@@ -26,31 +25,33 @@ column_names = [
 ]
 
 
-def load_train_data() -> pd.DataFrame:
+def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
     """
-    Load training data as Dataframe.
+    Load training data and divide it in labels and features.
 
     Returns
     -------
-    dataset : DataFrame
+    features : ndarray
+    
+    labels: ndarray
     """
-    dataset = pd.read_csv(
+    dataset = np.loadtxt(
         path.with_name("Train.txt"),
-        names=column_names,
-        index_col=False)
-    return dataset
+        delimiter=",").T
+    return dataset[:-1, :], dataset[-1, :]
 
-
-def load_test_data() -> pd.DataFrame:
+def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
     """
-    Load test data as Dataframe.
+    Load test data and divide it in labels and features.
 
     Returns
     -------
-    dataset : DataFrame
+    features : ndarray
 
+    labels: ndarray
     """
-    dataset = pd.read_csv(path.with_name("Test.txt"),
-                          names=column_names,
-                          index_col=False)
-    return dataset
+    dataset = np.loadtxt(
+        path.with_name("Test.txt"),
+        delimiter=",").T
+    return dataset[:-1, :], dataset[-1, :]
+
