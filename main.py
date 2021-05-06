@@ -18,6 +18,5 @@ def main() -> None:
     #plot_data = pt.plot_attributes(train_data)
     cm = dra.confusion_matrix(test_labels[:100], train_labels[:100])
 
-
 if __name__ == '__main__':
     main()
