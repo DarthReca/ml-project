@@ -14,14 +14,14 @@ import pandas as pd
 path = Path(__file__)
 
 column_names = [
-    "Mean of the integrated profile",
-    "Standard deviation of the integrated profile",
-    "Excess kurtosis of the integrated profile",
-    "Skewness of the integrated profile",
-    "Mean of the DM-SNR curve",
-    "Standard deviation of the DM-SNR curve",
-    "Excess kurtosis of the DM-SNR curve",
-    "Skewness of the DM-SNR curve",
+    "Integrated profile mean",
+    "Integrated profile SD",
+    "Integrated profile EK",
+    "Integrated profile skewness",
+    "DM-SNR curve mean",
+    "DM-SNR curve SD",
+    "DM-SNR curve EK",
+    "DM-SNR curve skewness",
     "Class"
 ]
 

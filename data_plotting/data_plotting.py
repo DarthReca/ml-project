@@ -38,7 +38,7 @@ def plot_attributes(data: pd.DataFrame):
         # green color to show true prediction
         ax[i].hist(pulsar.iloc[:, i], bins=bins, color='g', alpha=0.5)
         # increase fontsize to 16 for better report image
-        ax[i].set_title(pulsar_star.columns[i], fontsize=18)
+        ax[i].set_title(pulsar_star.columns[i])
         # the x-axis co-ordinates are not so useful, as we just want to look how
         # well separated the histograms are
         ax[i].axes.get_xaxis().set_visible(False)
