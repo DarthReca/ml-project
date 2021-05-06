@@ -1,10 +1,8 @@
 import numpy as np
 
 import data_loading as dl
-import data_plotting as pt
-import data_result_analysis as dra
 import dimensionality_reduction as dr
-
+import probability_density_function as pdf
 
 def main() -> None:
     """Only main."""
@@ -15,8 +13,9 @@ def main() -> None:
     test_data = dl.load_test_data()
     test_labels = test_data["Class"].to_numpy()
 
-    #plot_data = pt.plot_attributes(train_data)
-    cm = dra.confusion_matrix(test_labels[:100], train_labels[:100])
+    model = pdf.GaussianModel(train_data.to_numpy(), train_labels)
+    model.compute_parameters()
+
 
 if __name__ == '__main__':
     main()
