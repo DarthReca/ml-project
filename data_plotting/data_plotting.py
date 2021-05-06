@@ -13,6 +13,7 @@ import data_loading as dl
 
 sys.path.append("..")
 
+
 def plot_attributes(features: np.ndarray, labels: np.ndarray) -> None:
     """
     Plot features in a grid of hystograms, divided by labels.
@@ -20,9 +21,9 @@ def plot_attributes(features: np.ndarray, labels: np.ndarray) -> None:
     Parameters
     ----------
     features : np.ndarray
-        
+
     labels : np.ndarray
-        
+
     """
     # 2 columns each containing 4 figures, total 8 features
     fig, axes = plt.subplots(2, 4, figsize=(12, 4))
