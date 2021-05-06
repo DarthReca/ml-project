@@ -32,13 +32,14 @@ def load_train_data() -> Tuple[np.ndarray, np.ndarray]:
     Returns
     -------
     features : ndarray
-    
+
     labels: ndarray
     """
     dataset = np.loadtxt(
         path.with_name("Train.txt"),
         delimiter=",").T
-    return dataset[:-1, :], dataset[-1, :]
+    return dataset[:-1, :], dataset[-1, :].astype(np.int32)
+
 
 def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -53,5 +54,4 @@ def load_test_data() -> Tuple[np.ndarray, np.ndarray]:
     dataset = np.loadtxt(
         path.with_name("Test.txt"),
         delimiter=",").T
-    return dataset[:-1, :], dataset[-1, :]
-
+    return dataset[:-1, :], dataset[-1, :].astype(np.int32)
