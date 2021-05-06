@@ -6,8 +6,8 @@ import data_plotting as pt
 """Used to display results."""
 def main() -> None:
     """Only main."""
-    train_data = dl.load_train_data()
-    plot_data = pt.plot_attributes(train_data)
+    train_features, train_labels = dl.load_train_data()
+    plot_data = pt.plot_attributes(train_features, train_labels)
     # TODO: use main
 
 
