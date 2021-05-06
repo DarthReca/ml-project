@@ -18,10 +18,6 @@ def roc_det_curves(confusion_matrixes: List[np.ndarray]) -> None:
     confusion_matrix : List[np.ndarray]
         list of size t of ndarrays of size(2,2).
 
-    Returns
-    -------
-    None
-
     """
     fprs = []
     tprs = []
