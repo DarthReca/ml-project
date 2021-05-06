@@ -1,3 +1,0 @@
-import numpy as np
-
-def plot_attribute(data: np.ndarray, attribute: int) -> None: ...
