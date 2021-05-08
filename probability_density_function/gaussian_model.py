@@ -44,19 +44,20 @@ class GaussianModel:
                 - 0.5 * np.dot(dc.T, np.dot(sigma_inv, dc)).item())
 
     def _log_likelihood(self, features: np.ndarray) -> np.ndarray:
-        result: List[np.ndarray] = []
+        n = features.shape[1]
+        result = np.empty([2, n])
 
-        for i in range(features.shape[1]):
-            likelihood = np.empty([2, 1])
+        for i in range(n):
+            likelihood = np.empty(2)
             for lab in range(2):
                 curr_cov = self.covariances[lab]
                 curr_mean = self.means[lab]
                 curr_sample = np.row_stack(features[:, i])
                 likelihood[lab] = self._log_likelihood_sample(
                     curr_sample, curr_mean, curr_cov)
-            result.append(likelihood)
+            result[:, i] = likelihood
 
-        return np.hstack(result)
+        return result
 
     def predict(self, features: np.ndarray, prior_prob: float) -> np.ndarray:
         """

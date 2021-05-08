@@ -16,12 +16,11 @@ def main() -> None:
     model = pdf.GaussianModel()
     model.fit(train_features, train_labels)
     conf_ms = []
-    for prio in np.linspace(0.1, 0.8, num=20):
+    for prio in np.linspace(0.1, 0.8, num=10):
         pred = model.predict(train_features, prio)
         conf_ms.append(dra.confusion_matrix(train_labels, pred))
 
     dra.roc_det_curves(conf_ms)
-
 
 if __name__ == '__main__':
     main()
