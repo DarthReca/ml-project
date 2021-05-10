@@ -5,14 +5,23 @@ Created on Thu May  6 19:14:45 2021
 @author: gino9
 """
 
+import sys
+
+sys.path.append("..")
+
 from typing import List
 
 import numpy as np
+import dimensionality_reduction as dr
 
 
 class GaussianModel:
 
-    def fit(self, features: np.ndarray, labels: np.ndarray) -> None:
+    def fit(self, 
+            features: np.ndarray, 
+            labels: np.ndarray,
+            naive: bool = False,
+            tied_cov: bool = False) -> None:
         """
         Train the model with given features matrix and labels array.
 
@@ -21,6 +30,12 @@ class GaussianModel:
         features : np.ndarray
 
         labels : np.ndarray
+        
+        naive : optional, bool
+            Use naive assumption. Default False.
+        
+        tied_cov : optional, bool
+            Use tied covariance assumption. Default false.
 
         """
         self.means = []
@@ -29,8 +44,16 @@ class GaussianModel:
             selected_datas = features[:, labels == i]
             mean = np.vstack(selected_datas.mean(axis=1, dtype=np.float64))
             cov = np.cov(selected_datas, bias=True)
+            #Naive assumption
+            if naive:
+                cov = np.diag(np.diag(cov))
             self.means.append(mean)
             self.covariances.append(cov)
+        if tied_cov:
+            self.covariances = [dr.within_class_covariance(
+                features,
+                labels,
+                2)]
 
     def _log_likelihood_sample(self, x: np.ndarray,
                                mu: np.ndarray,
@@ -50,7 +73,9 @@ class GaussianModel:
         for i in range(n):
             likelihood = np.empty(2)
             for lab in range(2):
-                curr_cov = self.covariances[lab]
+                curr_cov = self.covariances[0]
+                if len(self.covariances) != 1:
+                    curr_cov = self.covariances[lab]
                 curr_mean = self.means[lab]
                 curr_sample = np.row_stack(features[:, i])
                 likelihood[lab] = self._log_likelihood_sample(
