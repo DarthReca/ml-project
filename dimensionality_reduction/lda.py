@@ -30,7 +30,7 @@ def within_class_covariance(data: np.ndarray, labels: np.ndarray,
     """
     sw = np.zeros((data.shape[0], data.shape[0]))
     for i in range(label_count):
-        selected = data[:, labels[0] == i]
+        selected = data[:, labels == i]
         sw += np.cov(selected, bias=True) * float(selected.shape[1])
     return sw / float(data.shape[1])
 
