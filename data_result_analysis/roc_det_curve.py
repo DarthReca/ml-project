@@ -5,10 +5,40 @@ Created on Thu May  6 08:59:17 2021
 @author: gino9
 """
 
-from typing import List
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+def _tpr_fnr(cm: np.ndarray) -> Tuple[float, float]:
+    tpr = cm[1, 1] / cm[:, 1].sum()
+    return tpr, 1 - tpr
+
+
+def _tnr_fpr(cm: np.ndarray) -> Tuple[float, float]:
+    fpr = cm[1, 0] / cm[:, 0].sum()
+    return 1 - fpr, fpr
+
+
+def thresholds_error_rates(
+    thresholds: np.ndarray, confusion_matrixes: List[np.ndarray]
+) -> None:
+    fprs = []
+    fnrs = []
+
+    for cm in confusion_matrixes:
+        _, fpr = _tnr_fpr(cm)
+        _, fnr = _tpr_fnr(cm)
+        fprs.append(fpr)
+        fnrs.append(fnr)
+
+    plt.plot(thresholds, fprs, label="False Positive Rate")
+    plt.plot(thresholds, fnrs, label="False Negative Rate")
+    plt.xlabel("Threshold")
+    plt.ylabel("Error rate")
+    plt.legend()
+    plt.show()
 
 
 def roc_det_curves(confusion_matrixes: List[np.ndarray]) -> None:
@@ -25,17 +55,14 @@ def roc_det_curves(confusion_matrixes: List[np.ndarray]) -> None:
     tprs = []
     fnrs = []
     for cm in confusion_matrixes:
-
-        tpr = cm[1, 1] / cm[:, 1].sum()
-        fpr = cm[1, 0] / cm[:, 0].sum()
-        fnr = 1 - tpr
+        tpr, fnr = _tpr_fnr(cm)
+        _, fpr = _tnr_fpr(cm)
 
         fprs.append(fpr)
         tprs.append(tpr)
         fnrs.append(fnr)
 
-    fig, (roc, det) = plt.subplots(
-        nrows=1, ncols=2, constrained_layout=True)
+    _, (roc, det) = plt.subplots(nrows=1, ncols=2, constrained_layout=True)
 
     roc.set_title("ROC")
     roc.plot(fprs, tprs)
