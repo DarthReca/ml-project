@@ -5,14 +5,12 @@ Created on Thu May  6 19:14:45 2021
 @author: gino9
 """
 
+import numpy as np
+import dimensionality_reduction as dr
+from typing import List
 import sys
 
 sys.path.append("..")
-
-from typing import List
-
-import dimensionality_reduction as dr
-import numpy as np
 
 
 class GaussianModel:
@@ -60,7 +58,8 @@ class GaussianModel:
             self.means.append(mean)
             self.covariances.append(cov)
         if tied_cov:
-            self.covariances = [dr.within_class_covariance(features, labels, 2)]
+            self.covariances = [
+                dr.within_class_covariance(features, labels, 2)]
 
     def _log_likelihood_sample(
         self, x: np.ndarray, mu: np.ndarray, sigma: np.ndarray
@@ -95,22 +94,25 @@ class GaussianModel:
 
         return result
 
-    def predict(self, features: np.ndarray, prior_prob: float) -> np.ndarray:
+    def predict(self, features: np.ndarray, prior_prob: float = -1, threshold: float = 0) -> np.ndarray:
         """
-        Apply model on feautures and predict label.
+        Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
 
         Parameters
         ----------
         features : np.ndarray
 
         prior_prob : float
+            If invalid use threshold. Default -1.
+        threshold : float
 
         Returns
         -------
         predictions: ndarray
 
         """
-        threshold = -np.log(prior_prob / (1 - prior_prob))
+        if prior_prob >= 0:
+            threshold = -np.log(prior_prob / (1 - prior_prob))
         likelihood = self._log_likelihood(features)
         ratio = likelihood[1, :] / likelihood[0, :]
         return (ratio > threshold).astype(np.int32)
