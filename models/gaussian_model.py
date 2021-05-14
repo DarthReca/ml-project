@@ -5,10 +5,10 @@ Created on Thu May  6 19:14:45 2021
 @author: gino9
 """
 
-import numpy as np
-import dimensionality_reduction as dr
-from typing import List
 import sys
+
+import dimensionality_reduction as dr
+import numpy as np
 
 sys.path.append("..")
 
@@ -58,8 +58,7 @@ class GaussianModel:
             self.means.append(mean)
             self.covariances.append(cov)
         if tied_cov:
-            self.covariances = [
-                dr.within_class_covariance(features, labels, 2)]
+            self.covariances = [dr.within_class_covariance(features, labels, 2)]
 
     def _log_likelihood_sample(
         self, x: np.ndarray, mu: np.ndarray, sigma: np.ndarray
@@ -94,7 +93,9 @@ class GaussianModel:
 
         return result
 
-    def predict(self, features: np.ndarray, prior_prob: float = -1, threshold: float = 0) -> np.ndarray:
+    def predict(
+        self, features: np.ndarray, prior_prob: float = -1, threshold: float = 0
+    ) -> np.ndarray:
         """
         Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
 
