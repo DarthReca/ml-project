@@ -7,9 +7,11 @@ Created on Mon May 10 23:53:59 2021
 
 from typing import Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from .confusion_matrix import confusion_matrix
+from .error_curves import roc_det_curves
 
 
 def dcf(
@@ -58,6 +60,7 @@ def min_norm_dcf(
     prior_prob_true: float,
     cost_fn: float,
     cost_fp: float,
+    plot_roc_det: bool = False,
 ) -> float:
     """
     Compute minimum normalized bayes risk.
@@ -81,10 +84,32 @@ def min_norm_dcf(
 
     """
     risks = []
+    conf_matrixes = []
 
-    for t in scores:
+    for t in np.sort(scores, kind="mergesort"):
         pred = (scores > t).astype(int)
         cm = confusion_matrix(labels, pred)
+        conf_matrixes.append(cm)
         risks.append(dcf(cm, prior_prob_true, cost_fn, cost_fp))
 
+    if plot_roc_det:
+        roc_det_curves(conf_matrixes)
+
     return min(risks)
+
+
+def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
+
+    prior_log_odds = np.linspace(-scores.max(), scores.max(), 20)
+    dcfs = []
+    min_dcfs = []
+
+    for t in prior_log_odds:
+        prior = 1 / (1 + np.exp(-t))
+        pred = (scores > t).astype(int)
+        cm = confusion_matrix(true_labels, pred)
+        dcfs.append(dcf(cm, prior, 1, 1))
+        min_dcfs.append(min_norm_dcf(scores, true_labels, prior, 1, 1))
+
+    plt.plot(prior_log_odds, dcfs, label="DCF", color="r")
+    plt.plot(prior_log_odds, min_dcfs, label="min DCF", color="b")

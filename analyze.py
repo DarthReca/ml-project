@@ -6,18 +6,16 @@ Created on Tue May 11 19:22:43 2021
 """
 
 import data_loading as dl
+import data_plotting as dp
 import data_result_analysis as dra
 import dimensionality_reduction as dr
-import data_plotting as dp
 import numpy as np
 
 
 def main():
     test_features, test_labels = dl.load_test_data()
     train_features, train_labels = dl.load_train_data()
-        
-    dp.scatter_attributes(train_features, train_labels)
-    
+
     """
     priors = np.linspace(0.1, 0.5, num=20)
     cms = []

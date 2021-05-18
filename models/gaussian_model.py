@@ -6,7 +6,9 @@ Created on Thu May  6 19:14:45 2021
 """
 
 import sys
+from typing import Tuple, Union
 
+import data_result_analysis as dra
 import dimensionality_reduction as dr
 import numpy as np
 
@@ -94,8 +96,8 @@ class GaussianModel:
         return result
 
     def predict(
-        self, features: np.ndarray, prior_prob: float = -1, threshold: float = 0
-    ) -> np.ndarray:
+        self, features: np.ndarray, prior_prob: float, return_scores: bool = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
         Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
 
@@ -104,16 +106,16 @@ class GaussianModel:
         features : np.ndarray
 
         prior_prob : float
-            If invalid use threshold. Default -1.
-        threshold : float
 
         Returns
         -------
         predictions: ndarray
 
         """
-        if prior_prob >= 0:
-            threshold = -np.log(prior_prob / (1 - prior_prob))
+        threshold = -np.log(prior_prob / (1 - prior_prob))
         likelihood = self._log_likelihood(features)
         ratio = likelihood[1, :] / likelihood[0, :]
-        return (ratio > threshold).astype(np.int32)
+        prediction = (ratio > threshold).astype(np.int32)
+        if return_scores:
+            return prediction, ratio
+        return prediction
