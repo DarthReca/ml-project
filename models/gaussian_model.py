@@ -6,22 +6,32 @@ Created on Thu May  6 19:14:45 2021
 """
 
 import sys
+from typing import Tuple, Union
+
+import data_result_analysis as dra
+import dimensionality_reduction as dr
+import numpy as np
 
 sys.path.append("..")
 
-from typing import List
-
-import numpy as np
-import dimensionality_reduction as dr
-
 
 class GaussianModel:
+    """Gaussian Model class.
 
-    def fit(self, 
-            features: np.ndarray, 
-            labels: np.ndarray,
-            naive: bool = False,
-            tied_cov: bool = False) -> None:
+    Attributes
+    ----------
+    means: ndarray
+
+    covariances: ndarray
+    """
+
+    def fit(
+        self,
+        features: np.ndarray,
+        labels: np.ndarray,
+        naive: bool = False,
+        tied_cov: bool = False,
+    ) -> None:
         """
         Train the model with given features matrix and labels array.
 
@@ -30,10 +40,10 @@ class GaussianModel:
         features : np.ndarray
 
         labels : np.ndarray
-        
+
         naive : optional, bool
             Use naive assumption. Default False.
-        
+
         tied_cov : optional, bool
             Use tied covariance assumption. Default false.
 
@@ -44,27 +54,27 @@ class GaussianModel:
             selected_datas = features[:, labels == i]
             mean = np.vstack(selected_datas.mean(axis=1, dtype=np.float64))
             cov = np.cov(selected_datas, bias=True)
-            #Naive assumption
+            # Naive assumption
             if naive:
                 cov = np.diag(np.diag(cov))
             self.means.append(mean)
             self.covariances.append(cov)
         if tied_cov:
-            self.covariances = [dr.within_class_covariance(
-                features,
-                labels,
-                2)]
+            self.covariances = [dr.within_class_covariance(features, labels, 2)]
 
-    def _log_likelihood_sample(self, x: np.ndarray,
-                               mu: np.ndarray,
-                               sigma: np.ndarray) -> float:
+    def _log_likelihood_sample(
+        self, x: np.ndarray, mu: np.ndarray, sigma: np.ndarray
+    ) -> float:
         m = x.shape[0]
         sign, sigma_log_det = np.linalg.slogdet(sigma)
         sigma_inv = np.linalg.inv(sigma)
         dc = x - mu
 
-        return (-m / 2 * np.log(2 * np.pi) - 0.5 * sigma_log_det
-                - 0.5 * np.dot(dc.T, np.dot(sigma_inv, dc)).item())
+        return (
+            -m / 2 * np.log(2 * np.pi)
+            - 0.5 * sigma_log_det
+            - 0.5 * np.dot(dc.T, np.dot(sigma_inv, dc)).item()
+        )
 
     def _log_likelihood(self, features: np.ndarray) -> np.ndarray:
         n = features.shape[1]
@@ -79,14 +89,17 @@ class GaussianModel:
                 curr_mean = self.means[lab]
                 curr_sample = np.row_stack(features[:, i])
                 likelihood[lab] = self._log_likelihood_sample(
-                    curr_sample, curr_mean, curr_cov)
+                    curr_sample, curr_mean, curr_cov
+                )
             result[:, i] = likelihood
 
         return result
 
-    def predict(self, features: np.ndarray, prior_prob: float) -> np.ndarray:
+    def predict(
+        self, features: np.ndarray, prior_prob: float, return_scores: bool = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
-        Apply model on feautures and predict label.
+        Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
 
         Parameters
         ----------
@@ -102,4 +115,7 @@ class GaussianModel:
         threshold = -np.log(prior_prob / (1 - prior_prob))
         likelihood = self._log_likelihood(features)
         ratio = likelihood[1, :] / likelihood[0, :]
-        return (ratio > threshold).astype(np.int32)
+        prediction = (ratio > threshold).astype(np.int32)
+        if return_scores:
+            return prediction, ratio
+        return prediction
