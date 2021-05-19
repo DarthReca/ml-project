@@ -32,9 +32,7 @@ class LogisticRegressionModel:
             log_sigmoid = np.log1p(np.exp(-b - np.dot(w.T, x_i)))
             minus_log_sigmoid = np.log1p(np.exp(b + np.dot(w.T, x_i)))
 
-            summatory += (
-                labels[0, i] * log_sigmoid + (1 - labels[0, i]) * minus_log_sigmoid
-            )
+            summatory += labels[i] * log_sigmoid + (1 - labels[i]) * minus_log_sigmoid
 
         return self.l / 2 * np.linalg.norm(w) ** 2 + 1 / n * summatory
 
