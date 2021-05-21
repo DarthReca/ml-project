@@ -9,8 +9,9 @@ import numpy as np
 from scipy.linalg import eigh  # type: ignore
 
 
-def within_class_covariance(data: np.ndarray, labels: np.ndarray,
-                            label_count: int) -> np.ndarray:
+def within_class_covariance(
+    data: np.ndarray, labels: np.ndarray, label_count: int
+) -> np.ndarray:
     """
     Compute within class covariance of data.
 
@@ -35,8 +36,9 @@ def within_class_covariance(data: np.ndarray, labels: np.ndarray,
     return sw / float(data.shape[1])
 
 
-def between_class_covariance(data: np.ndarray, labels: np.ndarray,
-                             label_count: int) -> np.ndarray:
+def between_class_covariance(
+    data: np.ndarray, labels: np.ndarray, label_count: int
+) -> np.ndarray:
     """
     Compute between class covariance of data.
 
@@ -57,15 +59,16 @@ def between_class_covariance(data: np.ndarray, labels: np.ndarray,
     sb = np.zeros((data.shape[0], data.shape[0]))
     mu = np.row_stack(data.mean(axis=1))
     for i in range(label_count):
-        selected = data[:, labels[0] == i]
+        selected = data[:, labels == i]
         muc = np.row_stack(selected.mean(axis=1))
         muc -= mu
         sb += float(selected.shape[1]) * np.dot(muc, muc.T)
     return sb / float(data.shape[1])
 
 
-def lda(data: np.ndarray, labels: np.ndarray,
-        label_count: int, dimensions: int) -> np.ndarray:
+def lda(
+    data: np.ndarray, labels: np.ndarray, label_count: int, dimensions: int
+) -> np.ndarray:
     """
     Perform linear discriminant analysis over data.
 

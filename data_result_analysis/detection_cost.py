@@ -103,9 +103,11 @@ def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
     prior_log_odds = np.linspace(-scores.max(), scores.max(), 20)
     dcfs = []
     min_dcfs = []
+    priors = []
 
     for t in prior_log_odds:
         prior = 1 / (1 + np.exp(-t))
+        priors.append(prior)
         pred = (scores > t).astype(int)
         cm = confusion_matrix(true_labels, pred)
         dcfs.append(dcf(cm, prior, 1, 1))
@@ -113,3 +115,7 @@ def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
 
     plt.plot(prior_log_odds, dcfs, label="DCF", color="r")
     plt.plot(prior_log_odds, min_dcfs, label="min DCF", color="b")
+    plt.xlabel("Prior log odds")
+    plt.ylabel("DCF")
+    plt.legend()
+    plt.show()

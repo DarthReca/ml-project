@@ -95,8 +95,14 @@ class GaussianModel:
 
         return result
 
+    def set_threshold(self, threshold: float):
+        self.threshold = threshold
+
+    def set_prior(self, prior: float):
+        self.threshold = -np.log(prior / (1 - prior))
+
     def predict(
-        self, features: np.ndarray, prior_prob: float, return_scores: bool = False
+        self, features: np.ndarray, return_scores: bool = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
         Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
@@ -107,15 +113,19 @@ class GaussianModel:
 
         prior_prob : float
 
+        return_scores: optional, bool
+
         Returns
         -------
         predictions: ndarray
 
+        ratio: optional, ndarray
+            returned if return_score == True
+
         """
-        threshold = -np.log(prior_prob / (1 - prior_prob))
         likelihood = self._log_likelihood(features)
         ratio = likelihood[1, :] / likelihood[0, :]
-        prediction = (ratio > threshold).astype(np.int32)
+        prediction = (ratio > self.threshold).astype(np.int32)
         if return_scores:
             return prediction, ratio
         return prediction

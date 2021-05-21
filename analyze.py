@@ -13,8 +13,12 @@ import numpy as np
 
 
 def main():
-    test_features, test_labels = dl.load_test_data()
     train_features, train_labels = dl.load_train_data()
+
+    # dp.scatter_attributes(train_features, train_labels)
+    train_features = dr.lda(train_features, train_labels, 2, 5)
+    train_features = dr.pca(train_features, 4)
+    dp.plot_attributes(train_features, train_labels)
 
     """
     priors = np.linspace(0.1, 0.5, num=20)
