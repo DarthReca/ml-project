@@ -18,11 +18,9 @@ def main() -> None:
 
     for i in range(k):
 
-        tr_feat = sampled_f[i]
-        tr_lab = sampled_l[i]
-
-        ts_feat = np.hstack([sampled_f[x] for x in range(k) if not i == x])
-        ts_lab = np.hstack([sampled_l[x] for x in range(k) if not i == x])
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
 
         gaussian_model.fit(tr_feat, tr_lab)
 

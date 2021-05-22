@@ -46,3 +46,19 @@ def shuffle_sample(
         s_labels.append(s[-1].astype(np.int32))
 
     return s_features, s_labels
+
+
+def train_validation_sets(
+    sampled_f: np.ndarray, sampled_l: np.ndarray, training_index: int
+) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
+    tr_feat = sampled_f[training_index]
+    tr_lab = sampled_l[training_index]
+    samples = len(sampled_f)
+
+    val_feat = np.hstack(
+        [sampled_f[x] for x in range(samples) if not training_index == x]
+    )
+    val_lab = np.hstack(
+        [sampled_l[x] for x in range(samples) if not training_index == x]
+    )
+    return (tr_feat, tr_lab), (val_feat, val_lab)
