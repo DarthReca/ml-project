@@ -10,15 +10,19 @@ import data_plotting as dp
 import data_result_analysis as dra
 import dimensionality_reduction as dr
 import numpy as np
+import preprocess as prep
 
 
 def main():
     train_features, train_labels = dl.load_train_data()
 
-    # dp.scatter_attributes(train_features, train_labels)
-    train_features = dr.lda(train_features, train_labels, 2, 5)
-    train_features = dr.pca(train_features, 4)
+    train_features = prep.center_features(train_features)
+    train_features = prep.standardize_variance(train_features)
+    train_features = prep.whiten_covariance(train_features)
+    train_features = prep.normalize_lenght(train_features)
+
     dp.plot_attributes(train_features, train_labels)
+    # dp.scatter_attributes(train_features, train_labels)
 
     """
     priors = np.linspace(0.1, 0.5, num=20)

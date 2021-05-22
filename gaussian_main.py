@@ -6,12 +6,18 @@ import data_plotting as pt
 import data_result_analysis as dra
 import models
 import numpy as np
+import preprocess as prep
 
 
 def main() -> None:
     """Only main."""
     features, labels = dl.load_train_data()
     gaussian_model = models.GaussianModel()
+
+    features = prep.center_features(features)
+    features = prep.standardize_variance(features)
+    features = prep.whiten_covariance(features)
+    features = prep.normalize_lenght(features)
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -23,11 +29,17 @@ def main() -> None:
         )
 
         gaussian_model.fit(tr_feat, tr_lab)
+        threshs = np.linspace(-5, 5, 10)
+        conf_ms = []
+        for i in threshs:
+            gaussian_model.set_threshold(i)
+            pred, scores = gaussian_model.predict(ts_feat, True)
 
-        gaussian_model.set_threshold(1.2)
-        pred, scores = gaussian_model.predict(ts_feat, True)
+            conf_ms.append(dra.confusion_matrix(ts_lab, pred))
 
-        print((pred == ts_lab).sum() / pred.shape[0])
+            print((pred == ts_lab).sum() / pred.shape[0])
+
+        dra.thresholds_error_rates(threshs, conf_ms)
 
         # np.save("./saved_data/gaussian.npy", pred)
 
