@@ -41,7 +41,7 @@ def shuffle_sample(
     sample_size = int(features.shape[1] / samples)
     for i in range(samples):
         start = i * sample_size
-        s = dataset[:, start : (start + sample_size)]
+        s = dataset[:, start: (start + sample_size)]
         s_features.append(s[:-1])
         s_labels.append(s[-1].astype(np.int32))
 
@@ -49,16 +49,16 @@ def shuffle_sample(
 
 
 def train_validation_sets(
-    sampled_f: np.ndarray, sampled_l: np.ndarray, training_index: int
+    sampled_f: np.ndarray, sampled_l: np.ndarray, validation_index: int
 ) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
-    tr_feat = sampled_f[training_index]
-    tr_lab = sampled_l[training_index]
+    val_feat = sampled_f[validation_index]
+    val_lab = sampled_l[validation_index]
     samples = len(sampled_f)
 
-    val_feat = np.hstack(
-        [sampled_f[x] for x in range(samples) if not training_index == x]
+    tr_feat = np.hstack(
+        [sampled_f[x] for x in range(samples) if not validation_index == x]
     )
-    val_lab = np.hstack(
-        [sampled_l[x] for x in range(samples) if not training_index == x]
+    tr_lab = np.hstack(
+        [sampled_l[x] for x in range(samples) if not validation_index == x]
     )
     return (tr_feat, tr_lab), (val_feat, val_lab)
