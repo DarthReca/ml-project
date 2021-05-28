@@ -25,7 +25,7 @@ def confusion_matrix(
     Returns
     -------
     confusion_matrix : ndarray
-        elemnt[i, j] is predicted as part of i class, but its class is j
+        element[i, j] is predicted as part of i class, but its class is j
     """
     # To be sure we have 1-D array
     true_labels = true_labels.flatten()

@@ -2,33 +2,63 @@
 """
 Created on Fri May 21 16:55:54 2021
 
-@author: gino9
+@author: DarthReca
 """
-
 
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
 
 class SupportVectorMachine:
-    def __init__(self):
-        self.k = 10
-        self.C = 0.1
+    def __init__(
+        self,
+        k: float,
+        C: float,
+        kernel_type: str = "polynomial",
+        kernel_grade: float = 1.0,
+        pol_kernel_c: float = 0.0,
+    ):
+        self.k = k
+        self.C = C
+
+        self.kernel_grade = kernel_grade
+        self.pol_kernel_c = pol_kernel_c
+        self.kernel_funct = self._polynomial_kernel
+        if kernel_type == "radial basis function":
+            self.kernel_funct = self._radial_basis_function_kernel
+
+    def _polynomial_kernel(self, sample_i: np.ndarray, sample_j: np.ndarray) -> float:
+        return (np.dot(sample_i.T, sample_j) + self.pol_kernel_c) ** self.kernel_grade
+
+    def _radial_basis_function_kernel(
+        self, sample_i: np.ndarray, sample_j: np.ndarray
+    ) -> float:
+        norm = np.linalg.norm(sample_i - sample_j) ** 2
+        return np.exp(-self.kernel_grade * norm)
 
     def _binary_cross_entropy(
-        self, samples: np.ndarray, z_labels: np.ndarray
+        self,
+        samples: np.ndarray,
+        z_labels: np.ndarray,
     ) -> np.ndarray:
         lab_count = z_labels.shape[0]
-        lab = np.broadcast_to(z_labels, [lab_count, lab_count])
-        return lab * lab.T * np.dot(samples.T, samples)
+        entropy = np.empty([lab_count, lab_count])
 
-    def fit(self, features: np.ndarray, labels: np.ndarray):
+        for i in range(lab_count):
+            for j in range(lab_count):
+                entropy[i, j] = z_labels[i] * z_labels[j]
+                entropy[i, j] *= (
+                    self.kernel_funct(samples[:, i], samples[:, j]) + self.k ** 2
+                )
+
+        return entropy
+
+    def fit(self, features: np.ndarray, labels: np.ndarray) -> None:
+
         samples_count = features.shape[1]
+        self.z_labels = 2 * labels - 1
 
-        z_labels = 2 * labels - 1
-        mapped_features = np.vstack([features, np.repeat(self.k, samples_count)])
-
-        cross_entropy = self._binary_cross_entropy(mapped_features, z_labels)
+        cross_entropy = self._binary_cross_entropy(features, self.z_labels)
 
         b = [(0, self.C) for _ in range(samples_count)]
         sol = fmin_l_bfgs_b(
@@ -39,23 +69,28 @@ class SupportVectorMachine:
             factr=1.0,
         )
 
-        self.w = np.zeros(mapped_features.shape[0])
-        for i in range(samples_count):
-            self.w += sol[0][i] * z_labels[i] * mapped_features[:, i]
+        # Keep only useful values
+        to_keep = sol[0] > 0
 
-    def predict(self, features: np.ndarray):
+        self.z_labels = self.z_labels[to_keep]
+        self.samples = features[:, to_keep]
+        self.alpha = sol[0][to_keep]
+
+    def predict(self, features: np.ndarray) -> None:
         samples_count = features.shape[1]
 
-        X = np.vstack([features, np.repeat(self.k, samples_count)])
-        scores = np.dot(self.w.T, X)
+        scores = np.empty(samples_count)
+        for t in range(samples_count):
+            current_sample = features[:, t]
+            summatory = 0.0
+            for i in range(self.samples.shape[1]):
+                kern = (
+                    self.kernel_funct(self.samples[:, i], current_sample) + self.k ** 2
+                )
+                summatory += self.alpha[i] * self.z_labels[i] * kern
+            scores[t] = summatory
 
         return (scores > 0).astype(np.int32)
-
-    def _primal_objective(self, w, C, X, Z):
-        J = 0.5 * np.linalg.norm(w) ** 2
-        for i in range(X.shape[1]):
-            J += C * max(0, 1 - Z[i] * np.dot(w.T, X[:, i]))
-        return J
 
     def _inverse_obj_funct(self, alpha: np.ndarray, cross_entropy: np.ndarray):
         samples_count = alpha.shape[0]
