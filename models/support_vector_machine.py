@@ -10,6 +10,26 @@ from scipy.optimize import fmin_l_bfgs_b
 
 
 class SupportVectorMachine:
+    """
+    Class for SVM.
+
+    Attributes
+    ----------
+    k: float
+        hyperparameter
+    C: float
+        hyperparameter
+    kernel_type: str
+        Choose between 'polynomial' or 'radial basis function'.
+        Default is 'polynomial'.
+    kernel_grade: float
+        Exponent of kernel
+        Default is 1.0
+    pol_kernel_c: float
+        If kernel_type is 'polynomial' this the c hyperparameter of polynomial kernel
+        Default is 0.0
+    """
+
     def __init__(
         self,
         k: float,
@@ -18,6 +38,25 @@ class SupportVectorMachine:
         kernel_grade: float = 1.0,
         pol_kernel_c: float = 0.0,
     ):
+        """
+        Class for SVM.
+
+        Attributes
+        ----------
+        k: float
+            hyperparameter
+        C: float
+            hyperparameter
+        kernel_type: optional, str
+            Choose between 'polynomial' or 'radial basis function'.
+            Default is 'polynomial'.
+        kernel_grade: optional, float
+            Exponent of kernel.
+            Default is 1.0
+        pol_kernel_c: optional, float
+            If kernel_type is 'polynomial' this the c hyperparameter of polynomial kernel.
+            Default is 0.0.
+        """
         self.k = k
         self.C = C
 
@@ -54,7 +93,16 @@ class SupportVectorMachine:
         return entropy
 
     def fit(self, features: np.ndarray, labels: np.ndarray) -> None:
+        """
+        Train the model on given features and labels.
 
+        Parameters
+        ----------
+        features : np.ndarray
+
+        labels : np.ndarray
+
+        """
         samples_count = features.shape[1]
         self.z_labels = 2 * labels - 1
 
@@ -76,7 +124,18 @@ class SupportVectorMachine:
         self.samples = features[:, to_keep]
         self.alpha = sol[0][to_keep]
 
-    def predict(self, features: np.ndarray) -> None:
+    def predict(self, features: np.ndarray) -> np.ndarray:
+        """
+        Predict labels of given features.
+
+        Parameters
+        ----------
+        features : np.ndarray
+
+        Returns
+        -------
+        predictons: np.ndarray
+        """
         samples_count = features.shape[1]
 
         scores = np.empty(samples_count)

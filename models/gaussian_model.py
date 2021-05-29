@@ -25,6 +25,14 @@ class GaussianModel:
     """
 
     def __init__(self, threshold: float):
+        """
+        Gaussian Model class.
+
+        Parameters
+        ----------
+        threshold : float
+            threshold for likelihood that separate classes.
+        """
         self.threshold = threshold
 
     def set_threshold(self, threshold: float) -> None:

@@ -15,11 +15,20 @@ class LogisticRegression:
 
     Attributes
     ----------
-    l: hyperparameter
-
-    obj_funct: object function
-
+    lamb: float
+        lambda hyperparameter
     """
+
+    def __init__(self, lamb: float):
+        """
+        Class for logistic regression.
+
+        Parameters
+        ----------
+        lamb : float
+            lambda hyperparameter.
+        """
+        self.l = lamb
 
     def _log_reg_obj(self, v: np.ndarray, features: np.ndarray, labels: np.ndarray):
         w, b = v[:-1], v[-1]
@@ -36,7 +45,7 @@ class LogisticRegression:
 
         return self.l / 2 * np.linalg.norm(w) ** 2 + 1 / n * summatory
 
-    def fit(self, features: np.ndarray, labels: np.ndarray, l: float) -> None:
+    def fit(self, features: np.ndarray, labels: np.ndarray) -> None:
         """
         Train model with features, labels and lambda.
 
@@ -45,12 +54,7 @@ class LogisticRegression:
         features : np.ndarray
 
         labels : np.ndarray
-
-        l : float
-            lambda hyperparameter.
-
         """
-        self.l = l
         x0 = np.zeros(features.shape[0] + 1)
         self.obj_funct = fmin_l_bfgs_b(
             self._log_reg_obj, x0, args=[features, labels], approx_grad=True

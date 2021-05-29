@@ -43,11 +43,8 @@ def plot_attributes(features: np.ndarray, labels: np.ndarray) -> None:
         ax[i].hist(pulsar[i, :], bins=bins, color="g", alpha=0.5)
         # increase fontsize to 16 for better report image
         ax[i].set_title(dl.labels_names[i])
-        # the x-axis co-ordinates are not so useful, as we just want to look how
-        # well separated the histograms are
-        ax[i].axes.get_xaxis().set_visible(False)
-        ax[i].set_yticks(())
-        ax[i].axis(ymax=200)
+        # ax[i].axis(ymax=200)
+        ax[i].autoscale_view(True)
 
     ax[0].legend(["Non-Pulsar", "Pulsar"], loc="best", fontsize=10)
     plt.tight_layout()  # let's make good plots
@@ -90,8 +87,9 @@ def scatter_attributes(features: np.ndarray, labels: np.ndarray) -> None:
             facecolors="none",
         )
 
-        ax.set_xlabel(dl.labels_names[c[0]])
-        ax.set_ylabel(dl.labels_names[c[1]])
+        #ax.set_xlabel(dl.labels_names[c[0]])
+        #ax.set_ylabel(dl.labels_names[c[1]])
 
         ax.legend()
+        ax.autoscale_view(True)
         plt.show()

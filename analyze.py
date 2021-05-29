@@ -18,17 +18,8 @@ def main():
     
     train_features = prep.apply_all_preprocess(train_features)   
 
-    # dp.plot_attributes(train_features, train_labels)
-    dp.scatter_attributes(train_features, train_labels)
-
-    """
-    priors = np.linspace(0.1, 0.5, num=20)
-    cms = []
-    for p in priors:
-        pred = np.load("./saved_data/gaussian-{}.npy".format(p))
-        cms.append(dra.confusion_matrix(test_labels, pred))
-    dra.thresholds_error_rates(priors, cms)
-    """
+    dp.plot_attributes(train_features, train_labels)
+    # dp.scatter_attributes(train_features, train_labels)
 
 
 if __name__ == "__main__":

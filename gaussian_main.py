@@ -37,14 +37,6 @@ def main() -> None:
 
         dra.thresholds_error_rates(threshs, conf_ms)
 
-    gaussian_model.fit(features, labels, naive=True)
-    pred = gaussian_model.predict(features)
-    np.save("./saved_data/naive_gaussian.npy", pred)
-
-    gaussian_model.fit(features, labels, tied_cov=True)
-    pred = gaussian_model.predict(features)
-    np.save("./saved_data/tied_gaussian.npy", pred)
-
 
 if __name__ == "__main__":
     main()
