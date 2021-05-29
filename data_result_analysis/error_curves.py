@@ -10,17 +10,7 @@ from typing import List, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .confusion_matrix import confusion_matrix
-
-
-def _tpr_fnr(cm: np.ndarray) -> Tuple[float, float]:
-    tpr = cm[1, 1] / cm[:, 1].sum()
-    return tpr, 1 - tpr
-
-
-def _tnr_fpr(cm: np.ndarray) -> Tuple[float, float]:
-    fpr = cm[1, 0] / cm[:, 0].sum()
-    return 1 - fpr, fpr
+from .confusion_matrix import confusion_matrix, tpr_fnr, tnr_fpr
 
 
 def thresholds_error_rates(
@@ -41,8 +31,8 @@ def thresholds_error_rates(
     fnrs = []
 
     for cm in confusion_matrixes:
-        _, fpr = _tnr_fpr(cm)
-        _, fnr = _tpr_fnr(cm)
+        _, fpr = tnr_fpr(cm)
+        _, fnr = tpr_fnr(cm)
         fprs.append(fpr)
         fnrs.append(fnr)
 
@@ -68,8 +58,8 @@ def roc_det_curves(confusion_matrixes: List[np.ndarray]) -> None:
     tprs = []
     fnrs = []
     for cm in confusion_matrixes:
-        tpr, fnr = _tpr_fnr(cm)
-        _, fpr = _tnr_fpr(cm)
+        tpr, fnr = tpr_fnr(cm)
+        _, fpr = tnr_fpr(cm)
 
         fprs.append(fpr)
         tprs.append(tpr)

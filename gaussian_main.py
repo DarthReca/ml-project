@@ -33,7 +33,7 @@ def main() -> None:
 
             conf_ms.append(cm)
 
-            print(cm)
+            print(dra.f_beta_score(cm, 0.5))
 
         dra.thresholds_error_rates(threshs, conf_ms)
 
