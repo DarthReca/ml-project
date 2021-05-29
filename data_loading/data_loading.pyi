@@ -1,3 +1,0 @@
-import numpy as np
-
-def dataset_load() -> np.ndarray: ...

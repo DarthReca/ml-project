@@ -18,12 +18,32 @@ sys.path.append("..")
 class GaussianModel:
     """Gaussian Model class.
 
-    Attributes
+    Parameters
     ----------
-    means: ndarray
-
-    covariances: ndarray
+    threshold: float
+        threshold for likelihood that separate classes.
     """
+
+    def __init__(self, threshold: float):
+        """
+        Gaussian Model class.
+
+        Parameters
+        ----------
+        threshold : float
+            threshold for likelihood that separate classes.
+        """
+        self.threshold = threshold
+
+    def set_threshold(self, threshold: float) -> None:
+        """
+        Set threshold for model.
+
+        Parameters
+        ----------
+        threshold : float
+        """
+        self.threshold = threshold
 
     def fit(
         self,
@@ -96,26 +116,28 @@ class GaussianModel:
         return result
 
     def predict(
-        self, features: np.ndarray, prior_prob: float, return_scores: bool = False
+        self, features: np.ndarray, return_scores: bool = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
-        Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
+        Apply model on feautures and predict label.
 
         Parameters
         ----------
         features : np.ndarray
 
-        prior_prob : float
+        return_scores: optional, bool
 
         Returns
         -------
         predictions: ndarray
 
+        ratio: optional, ndarray
+            returned if return_score == True
+
         """
-        threshold = -np.log(prior_prob / (1 - prior_prob))
         likelihood = self._log_likelihood(features)
         ratio = likelihood[1, :] / likelihood[0, :]
-        prediction = (ratio > threshold).astype(np.int32)
+        prediction = (ratio > self.threshold).astype(np.int32)
         if return_scores:
             return prediction, ratio
         return prediction
