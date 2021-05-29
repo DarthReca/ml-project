@@ -45,7 +45,7 @@ def f_beta_score(confusion_matrix: np.ndarray, beta: float) -> float:
     confusion_matrix : np.ndarray
         DESCRIPTION.
     beta : float
-        Best values are: 
+        Best values are:
             - 1 (mportant fn, fp
             - 2 important false negative
             - 0.5 important false positive
@@ -57,11 +57,19 @@ def f_beta_score(confusion_matrix: np.ndarray, beta: float) -> float:
     """
     prec = precision(confusion_matrix)
     rec = recall(confusion_matrix)
-    return ((1 + beta**2) * prec * rec) / (beta**2 * prec + rec)
+    return ((1 + beta ** 2) * prec * rec) / (beta ** 2 * prec + rec)
 
-def matthew_corr_coeff(cm: np.ndarray) -> float:
-    """-1 not good 1 good"""
-    pass
+
+def matthews_corr_coeff(cm: np.ndarray) -> float:
+    """Compute Matthews Correlation Coefficient. Range -1(bad), 1(good)."""
+    tp = cm[1, 1].astype(np.float64)
+    tn = cm[0, 0]
+    fp = cm[1, 0]
+    fn = cm[0, 1]
+    num = tp * tn - fp * fn
+    den = (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
+    return num / np.sqrt(den)
+
 
 def confusion_matrix(
     true_labels: np.ndarray, predicted_labels: np.ndarray
