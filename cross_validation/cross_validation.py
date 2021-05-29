@@ -33,7 +33,7 @@ def shuffle_sample(
 
     """
     dataset = np.vstack([features, labels])
-    rng = np.random.default_rng(seed=0)
+    rng = np.random.default_rng()
     rng.shuffle(dataset, axis=1)
 
     s_features = []

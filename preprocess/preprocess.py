@@ -38,3 +38,10 @@ def normalize_lenght(features: np.ndarray) -> np.ndarray:
         sample /= np.linalg.norm(sample)
         normalized[:, i] = sample
     return normalized
+
+
+def apply_all_preprocess(features: np.ndarray) -> np.ndarray:
+    f = center_features(features)
+    f = standardize_variance(f)
+    f = whiten_covariance(f)
+    return normalize_lenght(f)

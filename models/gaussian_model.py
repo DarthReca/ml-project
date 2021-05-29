@@ -18,12 +18,24 @@ sys.path.append("..")
 class GaussianModel:
     """Gaussian Model class.
 
-    Attributes
+    Parameters
     ----------
-    means: ndarray
-
-    covariances: ndarray
+    threshold: float
+        threshold for likelihood that separate classes.
     """
+
+    def __init__(self, threshold: float):
+        self.threshold = threshold
+
+    def set_threshold(self, threshold: float) -> None:
+        """
+        Set threshold for model.
+
+        Parameters
+        ----------
+        threshold : float
+        """
+        self.threshold = threshold
 
     def fit(
         self,
@@ -95,23 +107,15 @@ class GaussianModel:
 
         return result
 
-    def set_threshold(self, threshold: float):
-        self.threshold = threshold
-
-    def set_prior(self, prior: float):
-        self.threshold = -np.log(prior / (1 - prior))
-
     def predict(
         self, features: np.ndarray, return_scores: bool = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
-        Apply model on feautures and predict label. You must provide a threshold or a prior_probability.
+        Apply model on feautures and predict label.
 
         Parameters
         ----------
         features : np.ndarray
-
-        prior_prob : float
 
         return_scores: optional, bool
 

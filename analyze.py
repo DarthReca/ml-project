@@ -15,14 +15,11 @@ import preprocess as prep
 
 def main():
     train_features, train_labels = dl.load_train_data()
+    
+    train_features = prep.apply_all_preprocess(train_features)   
 
-    train_features = prep.center_features(train_features)
-    train_features = prep.standardize_variance(train_features)
-    train_features = prep.whiten_covariance(train_features)
-    train_features = prep.normalize_lenght(train_features)
-
-    dp.plot_attributes(train_features, train_labels)
-    # dp.scatter_attributes(train_features, train_labels)
+    # dp.plot_attributes(train_features, train_labels)
+    dp.scatter_attributes(train_features, train_labels)
 
     """
     priors = np.linspace(0.1, 0.5, num=20)

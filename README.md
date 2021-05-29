@@ -10,6 +10,10 @@
 
 ## Notes
 
+### Cross Validation
+
+- Overfitting or Underfitting can be good ([Shiring](https://shiring.github.io/machine_learning/2017/04/02/unbalanced))
+
 ### Gaussian Model
 
 - After preprocessing can be obtained better results (~0.4 accuracy)
