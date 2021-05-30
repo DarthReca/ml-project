@@ -10,8 +10,23 @@ def main():
     features, labels = dl.load_train_data()
     
     features = prep.apply_all_preprocess(features)
-    
-    models.SupportVectorMachine(0.0, 1.0, 'polynomial', 2.0, 0.0)
+        
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
+        ks = np.linspace(-100, 100, 10)
+        conf_ms = []
+        for kh in ks:
+            svm = models.SupportVectorMachine(kh, 1.0, 'polynomial', 2.0, 1.0)
+            svm.fit(tr_feat, tr_lab)
+            pred = svm.predict(ts_feat)
+            cm = dra.confusion_matrix(ts_lab, pred)
+            conf_ms.append(cm)
+            print(dra.matthews_corr_coeff(cm))
+        dra.thresholds_error_rates(ks, conf_ms)
     
     
 if __name__ == '__main__':

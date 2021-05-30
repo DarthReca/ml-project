@@ -20,18 +20,15 @@ def main():
     
     train_f = pp.apply_all_preprocess(train_f)
     
-    dp.scatter_attributes(features, labels)
-    dp.scatter_attributes(train_f, train_l)
-    
     gm = models.GaussianModel(0.0)
     
     gm.fit(train_f, train_l)
     
-    gm.set_threshold(-0.2)
-    
     pred = gm.predict(features)
     
-    print(dra.confusion_matrix(labels, pred))
+    cm = dra.confusion_matrix(labels, pred)
+    
+    print(dra.matthews_corr_coeff(cm))
 
 
 if __name__ == "__main__":

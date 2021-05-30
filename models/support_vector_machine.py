@@ -114,7 +114,7 @@ class SupportVectorMachine:
             np.zeros(samples_count),
             args=[cross_entropy],
             bounds=b,
-            factr=1.0,
+            factr=1e7
         )
 
         # Keep only useful values
