@@ -68,6 +68,8 @@ def matthews_corr_coeff(cm: np.ndarray) -> float:
     fn = cm[0, 1]
     num = tp * tn - fp * fn
     den = (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
+    if den == 0.0:
+        den = 1.0
     return num / np.sqrt(den)
 
 
