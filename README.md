@@ -10,6 +10,10 @@
 
 ## Notes
 
+### Correlation
+
+- Using Pearson Correlation Coefficient we can see that before preprocessing there is correlation between data
+
 ### Cross Validation
 
 - Overfitting or Underfitting can be good ([Shiring](https://shiring.github.io/machine_learning/2017/04/02/unbalanced))

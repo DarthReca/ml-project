@@ -1,1 +1,2 @@
-from .data_plotting import plot_attributes, scatter_attributes
+from .attributes_plotting import plot_attributes, scatter_attributes
+from .metrics_plotting import plot_matrix
