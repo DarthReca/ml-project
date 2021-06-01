@@ -39,15 +39,14 @@ def plot_attributes(features: np.ndarray, labels: np.ndarray) -> None:
         _, bins = np.histogram(features[i, :], bins=35)
         # red color to show false prediction
         ax[i].hist(wrong[i, :], bins=bins, color="r", alpha=0.2)
-        # green color to show true prediction
-        ax[i].hist(pulsar[i, :], bins=bins, color="g", alpha=0.5)
-        # increase fontsize to 16 for better report image
+        # blue color to show true prediction
+        ax[i].hist(pulsar[i, :], bins=bins, color="b", alpha=0.5)
         ax[i].set_title(dl.labels_names[i])
         # ax[i].axis(ymax=200)
         ax[i].autoscale_view(True)
 
     ax[0].legend(["Non-Pulsar", "Pulsar"], loc="best", fontsize=10)
-    plt.tight_layout()  # let's make good plots
+    plt.tight_layout()
     plt.show()
 
 
