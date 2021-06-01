@@ -55,8 +55,11 @@ def shuffle_sample(
         start_positive = i * positive_size
         start_negative = i * negative_size
         
-        ps = positive_samples[:, start_positive: (start_positive + positive_size)]
-        ns = negative_samples[:, start_negative: (start_negative + negative_size)]
+        end_positive = start_positive + positive_size
+        end_negative = start_negative + negative_size
+        
+        ps = positive_samples[:, start_positive: end_positive]
+        ns = negative_samples[:, start_negative: end_negative]
         
         s = np.hstack([ps, ns])
         

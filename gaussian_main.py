@@ -6,6 +6,32 @@ import models
 import numpy as np
 import preprocess as prep
 
+def analize_risk():
+    train_features, train_labels = dl.load_train_data()
+    
+    # Preprocess reduce the risk
+    train_features = prep.apply_all_preprocess(train_features)
+    
+    s_f, s_l = cv.shuffle_sample(train_features, train_labels, 5)
+    
+    for i in range(5):
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(s_f, s_l, i)
+        
+        model = models.GaussianModel(0.0)
+        model.set_prior(0.5)
+        model.fit(tr_feat, tr_lab)
+        pred, scores = model.predict(val_feat, True)
+        print("0.5:", dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1))
+        
+        model.set_prior(0.1)
+        model.fit(tr_feat, tr_lab)
+        pred, scores = model.predict(val_feat, True)
+        print("0.1", dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1))
+        
+        model.set_prior(0.9)
+        model.fit(tr_feat, tr_lab)
+        pred, scores = model.predict(val_feat, True)
+        print("0.9", dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1))
 
 def main() -> None:
     """Only main."""
@@ -39,4 +65,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    analize_risk()

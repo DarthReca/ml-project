@@ -9,6 +9,7 @@ import data_loading as dl
 import data_plotting as dp
 import data_result_analysis as dra
 import dimensionality_reduction as dr
+import cross_validation as cv
 import numpy as np
 import preprocess as prep
 
@@ -25,8 +26,6 @@ def analize_correlation():
     
     dp.plot_matrix(pcc, "Reds")
     
-def analize_risk():
-    train_features, train_labels = dl.load_train_data()
 
 
 def main():

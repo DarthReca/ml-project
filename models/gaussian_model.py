@@ -35,6 +35,9 @@ class GaussianModel:
         """
         self.threshold = threshold
 
+    def set_prior(self, prior: float) -> None:
+        self.threshold = -np.log(prior/(1 - prior))
+
     def set_threshold(self, threshold: float) -> None:
         """
         Set threshold for model.

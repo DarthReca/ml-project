@@ -5,6 +5,8 @@ Created on Fri May 14 22:28:09 2021
 @author: darthreca
 """
 
+from typing import Tuple, Union
+
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 
@@ -60,18 +62,25 @@ class LogisticRegression:
             self._log_reg_obj, x0, args=[features, labels], approx_grad=True
         )
 
-    def predict(self, features: np.ndarray) -> np.ndarray:
+    def predict(
+        self, features: np.ndarray, return_scores: bool = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
         Predict labels from features.
 
         Parameters
         ----------
         features : np.ndarray
+        
+        return_scores: optional, bool
+            Default is False.
 
         Returns
         -------
         labels: ndarray
             Predicted labels.
+        scores: optional, ndarray
+            Returned if `return_scores` == True
 
         """
         w, b = self.obj_funct[0][:-1], self.obj_funct[0][-1]
@@ -80,4 +89,7 @@ class LogisticRegression:
         for i in range(n):
             x_i = features[:, i]
             scores[i] = np.dot(w.T, x_i) + b
-        return (scores > 0).astype(np.int32)
+        pred = (scores > 0).astype(np.int32)
+        if return_scores:
+            return pred, scores
+        return pred
