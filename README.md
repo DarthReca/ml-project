@@ -13,6 +13,7 @@
 ### Correlation
 
 - Using Pearson Correlation Coefficient we can see that before preprocessing there is correlation between data
+- Gaussianization reduces a bit correlation
 
 ### Cross Validation
 
@@ -23,11 +24,11 @@
 - Min DCF show that there is miscalibration
     - Without preprocessing the miscalibration is higher
     - miscalibration is higher with naive and tied cov assumptions 
+    - Gaussianization is not improving min-dcf
 
 - After preprocessing can be obtained better results
 - Data of pulsar and non-pulsar are not well separated
 - Linear models will not achieve good result because they are not linearly separable
-- Preprocessed data are more or less a Gaussian
 
 ### Linear Regression
 

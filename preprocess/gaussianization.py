@@ -6,19 +6,16 @@ Created on Sat May 29 18:11:10 2021
 """
 
 import numpy as np
-from sklearn.stats import norm
+from scipy.stats import norm
 
 def gaussianize(features: np.ndarray):
-    pass
-
-def rank_feature(x: float, features: np.ndarray):
-    n = features.shape[1]
-    rank = 0.00
-    for x_i in features:
-        rank += 1
-        if x < x_i:
-            rank += 1
-    return rank / (n + 2)
+    """Perform gaussianization on features."""
+    r, c = features.shape
+    transformed = np.empty([r, c])
+    for i in range(c):
+        rank = 1 + (features[:, i].reshape([r, 1]) < features).sum(axis=1)
+        transformed[:, i] = norm.ppf(rank / (c + 2))
+    return transformed
     
     
     

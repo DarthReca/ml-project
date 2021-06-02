@@ -21,7 +21,7 @@ class LogisticRegression:
         lambda hyperparameter
     """
 
-    def __init__(self, lamb: float):
+    def __init__(self, lamb: float, prior_true: float):
         """
         Class for logistic regression.
 
@@ -31,19 +31,32 @@ class LogisticRegression:
             lambda hyperparameter.
         """
         self.l = lamb
+        self.prior_true = prior_true
 
     def _log_reg_obj(self, v: np.ndarray, features: np.ndarray, labels: np.ndarray):
         w, b = v[:-1], v[-1]
         n = features.shape[1]
+        z = 2 * labels - 1
 
-        summatory = 0
-        for i in range(n):
+        pos_f = features[:, labels == 1]
+        neg_f = features[:, labels == 0]
+        nt = pos_f.shape[1]
+        nf = neg_f.shape[1]
+
+        summatory_neg = 0
+        for i in range(nf):
             x_i = features[:, i]
+            exponent = -z[i] * (b + w.dot(x_i))
+            summatory_neg += np.log1p(np.exp(exponent))
+        summatory_pos = 0
+        for i in range(nt):
+            x_i = features[:, i]
+            exponent = -z[i] * (b + w.dot(x_i))
+            summatory_pos += np.log1p(np.exp(exponent))
 
-            log_sigmoid = np.log1p(np.exp(-b - np.dot(w.T, x_i)))
-            minus_log_sigmoid = np.log1p(np.exp(b + np.dot(w.T, x_i)))
-
-            summatory += labels[i] * log_sigmoid + (1 - labels[i]) * minus_log_sigmoid
+        summatory = (
+            1 - self.prior_true
+        ) / nf * summatory_neg + self.prior_true / nt * summatory_pos
 
         return self.l / 2 * np.linalg.norm(w) ** 2 + 1 / n * summatory
 
@@ -59,7 +72,12 @@ class LogisticRegression:
         """
         x0 = np.zeros(features.shape[0] + 1)
         self.obj_funct = fmin_l_bfgs_b(
-            self._log_reg_obj, x0, args=[features, labels], approx_grad=True
+            self._log_reg_obj,
+            x0,
+            args=[features, labels],
+            approx_grad=True,
+            maxiter=1000,
+            maxfun=1000,
         )
 
     def predict(
@@ -71,7 +89,7 @@ class LogisticRegression:
         Parameters
         ----------
         features : np.ndarray
-        
+
         return_scores: optional, bool
             Default is False.
 
@@ -85,10 +103,10 @@ class LogisticRegression:
         """
         w, b = self.obj_funct[0][:-1], self.obj_funct[0][-1]
         n = features.shape[1]
-        scores = np.empty(n)
+        scores = np.full(n, b)
         for i in range(n):
             x_i = features[:, i]
-            scores[i] = np.dot(w.T, x_i) + b
+            scores[i] += np.dot(w.T, x_i)
         pred = (scores > 0).astype(np.int32)
         if return_scores:
             return pred, scores

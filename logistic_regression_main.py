@@ -12,6 +12,10 @@ import data_result_analysis as dra
 import models
 import numpy as np
 import preprocess as prep
+import matplotlib.pyplot as plt
+
+def analize_risk_plot():
+    fig, ax = plt.subplots()
 
 def analize_risk():
     features, labels = dl.load_train_data()
@@ -29,7 +33,7 @@ def analize_risk():
         )
         
         for j in range(20):
-            log_regr = models.LogisticRegression(lams[j])
+            log_regr = models.LogisticRegression(lams[j], 0.5)
             log_regr.fit(tr_feat, tr_lab)
             pred, scores = log_regr.predict(ts_feat, True)
             low_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)

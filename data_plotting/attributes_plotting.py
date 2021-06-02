@@ -41,8 +41,6 @@ def plot_attributes(features: np.ndarray, labels: np.ndarray) -> None:
         ax[i].hist(wrong[i, :], bins=bins, color="r", alpha=0.2)
         # green color to show true prediction
         ax[i].hist(pulsar[i, :], bins=bins, color="g", alpha=0.5)
-        # increase fontsize to 16 for better report image
-        ax[i].set_title(dl.labels_names[i])
         # ax[i].axis(ymax=200)
         ax[i].autoscale_view(True)
 

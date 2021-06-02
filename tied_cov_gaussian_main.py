@@ -16,9 +16,10 @@ import preprocess as prep
 def analize_risk():
     train_features, train_labels = dl.load_train_data()
     
-    # Preprocess is useless
+    # Preprocess is useless and also Gaussianization
     # train_features = prep.apply_all_preprocess(train_features)
-    
+    # train_features = prep.gaussianize(train_features)
+
     s_f, s_l = cv.shuffle_sample(train_features, train_labels, 5)
     
     for i in range(5):

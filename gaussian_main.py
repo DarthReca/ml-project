@@ -11,7 +11,9 @@ def analize_risk():
     
     # Preprocess reduce the risk
     train_features = prep.apply_all_preprocess(train_features)
-    
+    # Gaussianization doesn't reduce the risk
+    # train_features = prep.gaussianize(train_features)
+
     s_f, s_l = cv.shuffle_sample(train_features, train_labels, 5)
     
     for i in range(5):

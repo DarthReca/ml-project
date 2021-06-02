@@ -39,7 +39,7 @@ def shuffle_sample(
     
     pos_perc = positive_samples.shape[1]/dataset.shape[1]
     
-    rng = np.random.default_rng(seed=0)
+    rng = np.random.default_rng()
     rng.shuffle(positive_samples, axis=1)
     rng.shuffle(negative_samples, axis=1)
 
