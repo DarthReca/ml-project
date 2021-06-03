@@ -32,4 +32,6 @@
 
 ### Linear Regression
 
+- Analizing the risk the natural choice seems $\lambda = 0$
+
 ### Support Vector Machine

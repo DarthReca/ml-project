@@ -76,8 +76,7 @@ class LogisticRegression:
             x0,
             args=[features, labels],
             approx_grad=True,
-            maxiter=1000,
-            maxfun=1000,
+            factr=1e7
         )
 
     def predict(

@@ -13,16 +13,16 @@ import models
 import numpy as np
 import preprocess as prep
 import matplotlib.pyplot as plt
-
-def analize_risk_plot():
-    fig, ax = plt.subplots()
+        
 
 def analize_risk():
     features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+    features = prep.gaussianize(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    lams = np.linspace(-1, 1, 20)
+    lams = np.linspace(1e-5, 1e5, 20)
 
     low_dcf = np.empty([k, 20])
     norm_dcf = np.empty([k, 20])
@@ -41,6 +41,59 @@ def analize_risk():
             high_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
     pass
 
+def print_min_risk():
+    select_l = 1e-5
+    k = 5
+
+    features, labels = dl.load_train_data()
+    # Some benefits only for pi = 0.9
+    features = prep.apply_all_preprocess(features)
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+
+    
+    low_lr = models.LogisticRegression(select_l, 0.1)
+    norm_lr = models.LogisticRegression(select_l, 0.5)
+    high_lr = models.LogisticRegression(select_l, 0.9)
+    
+    min_dcf_1 = np.empty([k , 3])
+    min_dcf_5 = np.empty([k , 3])
+    min_dcf_9 = np.empty([k , 3])
+    
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
+        
+        low_lr.fit(tr_feat, tr_lab)
+        norm_lr.fit(tr_feat, tr_lab)
+        high_lr.fit(tr_feat, tr_lab)
+        
+        _, l_scores = low_lr.predict(ts_feat, True)
+        _, n_scores = norm_lr.predict(ts_feat, True)
+        _, h_scores = high_lr.predict(ts_feat, True)
+        
+        # print("pi_t = 0.1")
+        min_dcf_1[i, 0] = dra.min_norm_dcf(l_scores, ts_lab, 0.1, 1, 1)
+        min_dcf_1[i, 1] = dra.min_norm_dcf(l_scores, ts_lab, 0.5, 1, 1)
+        min_dcf_1[i, 2] = dra.min_norm_dcf(l_scores, ts_lab, 0.9, 1, 1)
+        
+        # print("pi_t = 0.5")
+        min_dcf_5[i, 0] = dra.min_norm_dcf(n_scores, ts_lab, 0.1, 1, 1)
+        min_dcf_5[i, 1] = dra.min_norm_dcf(n_scores, ts_lab, 0.5, 1, 1)
+        min_dcf_5[i, 2] = dra.min_norm_dcf(n_scores, ts_lab, 0.9, 1, 1)
+
+        # print("pi_t = 0.9")
+        min_dcf_9[i, 0] = dra.min_norm_dcf(h_scores, ts_lab, 0.1, 1, 1)
+        min_dcf_9[i, 1] = dra.min_norm_dcf(h_scores, ts_lab, 0.5, 1, 1)
+        min_dcf_9[i, 2] = dra.min_norm_dcf(h_scores, ts_lab, 0.9, 1, 1)
+        
+    print("pi_t = 0.1")
+    print("0.1, 0.5, 0.9", min_dcf_1.mean(axis=0))
+    print("pi_t = 0.5")
+    print("0.1, 0.5, 0.9", min_dcf_5.mean(axis=0))
+    print("pi_t = 0.9")
+    print("0.1, 0.5, 0.9", min_dcf_9.mean(axis=0))
+
 def main():
     features, labels = dl.load_train_data()
     
@@ -52,16 +105,14 @@ def main():
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        lams = np.linspace(-100, 100, 10)
+
         conf_ms = []
-        for l in lams:
-            log_regr = models.LogisticRegression(l)
-            log_regr.fit(tr_feat, tr_lab)
-            pred = log_regr.predict(ts_feat)
-            cm = dra.confusion_matrix(ts_lab, pred)
-            conf_ms.append(cm)
-            print(dra.matthews_corr_coeff(cm))
-        dra.thresholds_error_rates(lams, conf_ms)
+        log_regr = models.LogisticRegression(1e-5, 0.5)
+        log_regr.fit(tr_feat, tr_lab)
+        pred = log_regr.predict(ts_feat)
+        cm = dra.confusion_matrix(ts_lab, pred)
+        conf_ms.append(cm)
+        print(dra.matthews_corr_coeff(cm))
 
 if __name__ == '__main__':
-    analize_risk()    
+    print_min_risk()    
