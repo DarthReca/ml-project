@@ -14,11 +14,21 @@ import numpy as np
 import preprocess as prep
 import matplotlib.pyplot as plt
         
+def plot_risk():
+    fig, ax = plt.subplots()
+    
+    ax.plot(lams, norm_dcf.mean(axis=0), label="prior 0.5")
+    ax.plot(lams, low_dcf.mean(axis=0), label="prior 0.1")
+    ax.plot(lams, high_dcf.mean(axis=0), label="prior 0.9")
+
+    ax.set_xscale("log")
+    ax.legend()    
+    plt.show()
 
 def analize_risk():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
-    features = prep.gaussianize(features)
+    # features = prep.apply_all_preprocess(features)
+    # features = prep.gaussianize(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -31,6 +41,10 @@ def analize_risk():
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
+        
+        # Gaussianization doesn't reduce the risk
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         for j in range(20):
             log_regr = models.LogisticRegression(lams[j], 0.5)
@@ -94,25 +108,6 @@ def print_min_risk():
     print("pi_t = 0.9")
     print("0.1, 0.5, 0.9", min_dcf_9.mean(axis=0))
 
-def main():
-    features, labels = dl.load_train_data()
-    
-    features = prep.apply_all_preprocess(features)
-    
-    k = 5
-    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
-            sampled_f, sampled_l, i
-        )
-
-        conf_ms = []
-        log_regr = models.LogisticRegression(1e-5, 0.5)
-        log_regr.fit(tr_feat, tr_lab)
-        pred = log_regr.predict(ts_feat)
-        cm = dra.confusion_matrix(ts_lab, pred)
-        conf_ms.append(cm)
-        print(dra.matthews_corr_coeff(cm))
 
 if __name__ == '__main__':
-    print_min_risk()    
+    plot_risk()    

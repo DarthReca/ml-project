@@ -20,7 +20,7 @@ def main():
     
     train_f = pp.apply_all_preprocess(train_f)
     
-    gm = models.GaussianModel(0.0)
+    gm = models.LogisticRegression(1e-5, 0.5)
     
     gm.fit(train_f, train_l)
     

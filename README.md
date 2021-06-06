@@ -15,23 +15,46 @@
 - Using Pearson Correlation Coefficient we can see that before preprocessing there is correlation between data
 - Gaussianization reduces a bit correlation
 
-### Cross Validation
-
-- Overfitting or Underfitting can be good ([Shiring](https://shiring.github.io/machine_learning/2017/04/02/unbalanced))
-
 ### Gaussian Model
 
-- Min DCF show that there is miscalibration
-    - Without preprocessing the miscalibration is higher
-    - miscalibration is higher with naive and tied cov assumptions 
-    - Gaussianization is not improving min-dcf
+| Method \ prior | 0.1  | 0.5   | 0.9   |
+| -------------- | ---- | ----- | ----- |
+| No prep        | 1.0  | 1.0   | 1.055 |
+| Prep           | 1.0  | 0.613 | 0.771 |
+| Gaussianized   | 1.0  | 1.0   | 1.055 |
 
-- After preprocessing can be obtained better results
+*Naive*
+
+| Method \ prior | 0.1  | 0.5  | 0.9   |
+| -------------- | ---- | ---- | ----- |
+| No prep        | 1.0  | 1.0  | 1.055 |
+| Prep           | 1.0  | 1.0  | 1.055 |
+| Gaussianized   | 1.0  | 1.0  | 1.055 |
+
+*Tied covariance*
+
+| Method \ prior | 0.1  | 0.5   | 0.9   |
+| -------------- | ---- | ----- | ----- |
+| No prep        | 1.0  | 1.0   | 1.055 |
+| Prep           | 1.0  | 0.997 | 1.008 |
+| Gaussianized   | 1.0  | 0.999 | 1.055 |
+
 - Data of pulsar and non-pulsar are not well separated
 - Linear models will not achieve good result because they are not linearly separable
 
 ### Linear Regression
 
-- Analizing the risk the natural choice seems $\lambda = 0$
+- Analizing the risk the natural choice seems $\lambda \to 0$
+
+*$\lambda = 1e-5$*
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.579 | 0.191 | 0.700 |
+| Prep           | 0.274 | 0.124 | 0.554 |
+| Gaussianized   | 0.440 | 0.173 | 0.464 |
+
+- Gaussianization is bad, Preprocessing is good
+- Linear Regression is better than MVG
 
 ### Support Vector Machine

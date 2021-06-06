@@ -30,6 +30,17 @@ def analize_correlation():
     pcc = np.corrcoef(gaussianized)
     dp.plot_matrix(pcc, "Reds")
     
+def analize_class_correlation():
+    train_features, train_labels = dl.load_train_data()
+    train_features = prep.apply_all_preprocess(train_features)
+    
+    pcc = np.corrcoef(train_features[:, train_labels == 1])
+    dp.plot_matrix(pcc, "Blues")
+    
+    pcc = np.corrcoef(train_features[:, train_labels == 0])
+    dp.plot_matrix(pcc, "Reds")
+
+    
 def analize_gaussianization():
     features, labels = dl.load_train_data()
 
@@ -40,9 +51,7 @@ def analize_gaussianization():
     gaussianized = prep.gaussianize(preprocessed)
     dp.plot_attributes(gaussianized, labels)
 
-def main():
-    analize_correlation()
 
 
 if __name__ == "__main__":
-    main()
+    analize_class_correlation()

@@ -21,7 +21,7 @@ class LogisticRegression:
         lambda hyperparameter
     """
 
-    def __init__(self, lamb: float, prior_true: float):
+    def __init__(self, lamb: float, prior_true: float, quadratic: bool = False):
         """
         Class for logistic regression.
 
@@ -29,9 +29,14 @@ class LogisticRegression:
         ----------
         lamb : float
             lambda hyperparameter.
+        prior_true: float
+            prior probability true class
+        quadratic: optional, bool
+            Use quadratic logistic regression
         """
         self.l = lamb
         self.prior_true = prior_true
+        self.quadratic = quadratic
 
     def _log_reg_obj(self, v: np.ndarray, features: np.ndarray, labels: np.ndarray):
         w, b = v[:-1], v[-1]
@@ -58,7 +63,7 @@ class LogisticRegression:
             1 - self.prior_true
         ) / nf * summatory_neg + self.prior_true / nt * summatory_pos
 
-        return self.l / 2 * np.linalg.norm(w) ** 2 + 1 / n * summatory
+        return self.l / 2 * np.linalg.norm(w) ** 2 + summatory
 
     def fit(self, features: np.ndarray, labels: np.ndarray) -> None:
         """
@@ -71,12 +76,24 @@ class LogisticRegression:
         labels : np.ndarray
         """
         x0 = np.zeros(features.shape[0] + 1)
+        mapped = features
+        
+        r, n = features.shape
+        if self.quadratic :
+            mapped = np.empty([r*r+r ,n])
+            x0 = np.zeros([r*r+r+1])
+            for i in range(n):
+                x_i = features[:, i].reshape([r ,1])
+                mat = x_i.dot(x_i.T)
+                mat = mat.flatten("F")
+                mapped[:, i] = np.vstack([mat.reshape([r**2, 1]), x_i])[:, 0]
+        
         self.obj_funct = fmin_l_bfgs_b(
             self._log_reg_obj,
             x0,
-            args=[features, labels],
+            args=[mapped, labels],
             approx_grad=True,
-            factr=1e7
+            factr=1e12
         )
 
     def predict(
