@@ -72,13 +72,17 @@ class SupportVectorMachine:
         if kernel_type == "radial basis function":
             self.kernel_funct = self._radial_basis_function_kernel
 
-    def _polynomial_kernel(self, sample: np.ndarray, features: np.ndarray) -> np.ndarray:
-        return ((sample * features).sum(axis=0) + self.pol_kernel_c) ** self.kernel_grade 
+    def _polynomial_kernel(
+        self, sample: np.ndarray, features: np.ndarray
+    ) -> np.ndarray:
+        return (
+            (sample * features).sum(axis=0) + self.pol_kernel_c
+        ) ** self.kernel_grade
 
     def _radial_basis_function_kernel(
         self, sample: np.ndarray, features: np.ndarray
     ) -> np.ndarray:
-        norm = np.linalg.norm(sample - features, axis=0)**2
+        norm = np.linalg.norm(sample - features, axis=0) ** 2
         return np.exp(-self.kernel_grade * norm)
 
     def _binary_cross_entropy(
@@ -153,18 +157,14 @@ class SupportVectorMachine:
         -------
         predictons: np.ndarray
         """
-        samples_count = features.shape[1]
+        r, samples_count = features.shape
 
         scores = np.empty(samples_count)
         for t in range(samples_count):
-            current_sample = features[:, t]
-            summatory = 0.0
-            for i in range(self.samples.shape[1]):
-                kern = (
-                    self.kernel_funct(self.samples[:, i], current_sample) + self.k ** 2
-                )
-                summatory += self.alpha[i] * self.z_labels[i] * kern
-            scores[t] = summatory
+            current_sample = features[:, t].reshape([r, 1])
+            kern = self.kernel_funct(self.samples, current_sample) + self.k ** 2
+            scores[t] = (self.alpha * self.z_labels * kern).sum()
+
         pred = (scores > 0).astype(np.int32)
         if return_scores:
             return pred, scores
