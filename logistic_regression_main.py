@@ -27,9 +27,8 @@ def plot_risk():
 
 def analize_risk():
     features, labels = dl.load_train_data()
-    # features = prep.apply_all_preprocess(features)
-    # features = prep.gaussianize(features)
-    
+    features = prep.apply_all_preprocess(features)
+        
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
     lams = np.linspace(1e-5, 1e5, 20)
@@ -43,8 +42,8 @@ def analize_risk():
         )
         
         # Gaussianization doesn't reduce the risk
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         for j in range(20):
             log_regr = models.LogisticRegression(lams[j], 0.5)
