@@ -96,4 +96,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    print_min_risk()
+    plot_risk()

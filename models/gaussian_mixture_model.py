@@ -5,7 +5,7 @@ Created on Mon Jun  7 14:52:40 2021
 @author: DarthReca
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 from scipy.special import logsumexp
@@ -198,7 +198,9 @@ class GaussianMixtureModel:
             params = self._lbg(curr, num_gaussians)
             self.gaussian_mixtures.append(params)
 
-    def predict(self, features: np.ndarray):
+    def predict(
+        self, features: np.ndarray, return_scores: bool = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """Predict labels for given features."""
         labels_count = len(self.gaussian_mixtures)
         log_densities = np.empty([labels_count, features.shape[1]])
@@ -210,4 +212,7 @@ class GaussianMixtureModel:
         joints = log_densities + np.log(1 / 3)
         marginal = logsumexp(joints, axis=0)
         joints -= marginal
-        return joints.argmax(axis=0)
+        pred = joints.argmax(axis=0)
+        if return_scores:
+            return pred, joints
+        return pred
