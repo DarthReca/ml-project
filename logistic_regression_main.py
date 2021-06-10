@@ -14,6 +14,29 @@ import numpy as np
 import preprocess as prep
 import matplotlib.pyplot as plt
         
+def log_regr_roc():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+        
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+    t = np.linspace(-15, 15, 20)
+    log_regr = models.LogisticRegression(1e-5, 0.5)
+    cms = []
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
+        cms.append([])
+        for j in range(t.shape[0]):
+            log_regr.set_threshold(t[j])
+            log_regr.fit(tr_feat, tr_lab)
+            pred, score = log_regr.predict(ts_feat, True)
+            cms[i].append(dra.confusion_matrix(ts_lab, pred))
+        dra.roc_det_curves(cms[i])
+    pass
+        
+
 def plot_risk():
     fig, ax = plt.subplots()
     
@@ -109,4 +132,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    plot_risk()    
+    log_regr_roc()    

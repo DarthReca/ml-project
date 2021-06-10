@@ -111,3 +111,6 @@ $C = 1e-3, \gamma = 0.1$
 | Prep           | 0.290 | 0.150 | 0.537 |
 | Gaussianized   | 0.214 | 0.113 | 0.647 |
 
+## Roc Analysis
+
+Plotting the different ROCS of Logistic Regression, Linear SVM, Quadratic SVM -> Linear SVM is the most stable, Quadratic can sometimes achieve better results, also Logistic Regression can work well a little less than linear svm

@@ -37,6 +37,7 @@ class LogisticRegression:
         self.l = lamb
         self.prior_true = prior_true
         self.quadratic = quadratic
+        self.threshold = 0.0
 
     def _log_reg_obj(self, v: np.ndarray, features: np.ndarray, labels: np.ndarray):
         w, b = v[:-1], v[-1]
@@ -96,6 +97,9 @@ class LogisticRegression:
             factr=1e12
         )
 
+    def set_threshold(self, threshold: float):
+        self.threshold = threshold
+
     def predict(
         self, features: np.ndarray, return_scores: bool = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
@@ -123,7 +127,7 @@ class LogisticRegression:
         for i in range(n):
             x_i = features[:, i]
             scores[i] += np.dot(w.T, x_i)
-        pred = (scores > 0).astype(np.int32)
+        pred = (scores >= self.threshold).astype(np.int32)
         if return_scores:
             return pred, scores
         return pred

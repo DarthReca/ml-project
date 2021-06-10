@@ -7,6 +7,55 @@ import models
 import numpy as np
 import preprocess as prep
 
+def linear_svm_roc():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+    
+    cms = []
+    t = np.linspace(-2, 2, 20)
+    
+    svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                      kernel_grade=1.0, pol_kernel_c=1.0)
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
+        cms.append([])
+        for j in range(t.shape[0]):
+            svm.set_threshold(t[j])
+            svm.fit(tr_feat, tr_lab)
+            pred, scores = svm.predict(ts_feat, True)
+            cms[i].append(dra.confusion_matrix(ts_lab, pred))
+        dra.roc_det_curves(cms[i])
+    pass
+
+def quadratic_svm_roc():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+    
+    cms = []
+    t = np.linspace(-2, 2, 20)
+    
+    svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                      kernel_grade=2.0, pol_kernel_c=1.0)
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
+        cms.append([])
+        for j in range(t.shape[0]):
+            svm.set_threshold(t[j])
+            svm.fit(tr_feat, tr_lab)
+            pred, scores = svm.predict(ts_feat, True)
+            cms[i].append(dra.confusion_matrix(ts_lab, pred))
+        dra.roc_det_curves(cms[i])
+    pass
 
 def plot_risk():
     fig, ax = plt.subplots()
@@ -96,4 +145,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    plot_risk()
+    quadratic_svm_roc()

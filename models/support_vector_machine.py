@@ -62,6 +62,7 @@ class SupportVectorMachine:
             If kernel_type is 'polynomial' this the c hyperparameter of polynomial kernel.
             Default is 0.0.
         """
+        self.threshold = 0.0
         self.k = k
         self.C = C
         self.prior_true = prior_true
@@ -98,6 +99,9 @@ class SupportVectorMachine:
             curr = samples[:, i].reshape([r, 1])
             entropy[i] *= self.kernel_funct(curr, samples) + self.k ** 2
         return entropy
+
+    def set_threshold(self, threshold: float):
+        self.threshold = threshold
 
     def fit(self, features: np.ndarray, labels: np.ndarray) -> None:
         """
@@ -165,7 +169,7 @@ class SupportVectorMachine:
             kern = self.kernel_funct(self.samples, current_sample) + self.k ** 2
             scores[t] = (self.alpha * self.z_labels * kern).sum()
 
-        pred = (scores > 0).astype(np.int32)
+        pred = (scores >= self.threshold).astype(np.int32)
         if return_scores:
             return pred, scores
         return pred
