@@ -114,3 +114,11 @@ $C = 1e-3, \gamma = 0.1$
 ## Roc Analysis
 
 Plotting the different ROCS of Logistic Regression, Linear SVM, Quadratic SVM -> Linear SVM is the most stable, Quadratic can sometimes achieve better results, also Logistic Regression can work well a little less than linear svm
+
+## Miscalibration Analysis
+
+From DCF analysis:
+
+- Log Regr is better calibrated for different type of prior and has a wider range of values that can achieve good results
+- Linear SVM (k=1.0, C=1e-3, prior=0.5, grade=1.0, c=1) has less miscalibration than Log Regr with prior 0.5
+- RBF SVM 

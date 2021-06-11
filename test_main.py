@@ -22,6 +22,8 @@ def main():
     
     gm = models.LogisticRegression(1e-5, 0.5)
     
+    gm.set_threshold(0.1)
+    
     gm.fit(train_f, train_l)
     
     pred = gm.predict(features)

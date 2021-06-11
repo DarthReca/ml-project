@@ -117,5 +117,8 @@ def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
     plt.plot(prior_log_odds, min_dcfs, label="min DCF", color="b")
     plt.xlabel("Prior log odds")
     plt.ylabel("DCF")
+    
+    plt.xticks(prior_log_odds, rotation="vertical")
+    
     plt.legend()
     plt.show()
