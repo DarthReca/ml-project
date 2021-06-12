@@ -21,25 +21,25 @@ def calibrate_score():
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
-    k_dfcs = []
-    k_threshs = []
-    k_min_dcfs = []
     k_scores = []
+    k_labs = []
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
         
-        log_reg = models.LogisticRegression(1e-5, 0.5)
+        log_reg = models.LogisticRegression(1e-5, 0.1)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
         
         k_scores.append(scores)
+        k_labs.append(ts_lab)
 
 
-    scores = np.hstack(scores)
-    sampled_s, sampled_slab = cv.shuffle_sample(scores, ts_lab, 2)
+    scores = np.hstack(k_scores)
+    scores_labs = np.hstack(k_labs)
+    sampled_s, sampled_slab = cv.shuffle_sample(scores, scores_labs, 2)
     
     (tr_scores, tr_slab), (val_scores, val_slab) = cv.train_validation_sets(
         sampled_s, sampled_slab, 1)
@@ -51,16 +51,16 @@ def calibrate_score():
        t = tr_scores[0][ti]
        pred_s = (tr_scores >= t).astype(np.int32)
        cm = dra.confusion_matrix(tr_slab, pred_s)
-       dcfs[ti] = dra.dcf(cm, 0.5, 1, 1)
+       dcfs[ti] = dra.dcf(cm, 0.1, 1, 1)
     
     selected_thresh = tr_scores[0, dcfs.argmin()]
 
     pred_s = (val_scores >= selected_thresh).astype(np.int32)
     cm = dra.confusion_matrix(val_slab, pred_s)
     
-    print(dra.dcf(cm, 0.5, 1, 1))
+    print(dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
-    print(dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1))
+    print(dra.min_norm_dcf(scores, scores_labs, 0.1, 1, 1))
     pass        
 
 def log_regr_bayes_err_plot():
@@ -75,7 +75,7 @@ def log_regr_bayes_err_plot():
             sampled_f, sampled_l, i
         )   
     
-        log_reg = models.LogisticRegression(1e-5, 0.5)
+        log_reg = models.LogisticRegression(1e-5, 0.1)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -123,8 +123,8 @@ def log_regr_dcf():
         cm = dra.confusion_matrix(ts_lab, pred)
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1) 
         dcf_9[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
-
     pass
+
 def log_regr_roc():
     features, labels = dl.load_train_data()
     features = prep.apply_all_preprocess(features)
@@ -243,4 +243,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    calibrate_score()    
+    log_regr_bayes_err_plot()    

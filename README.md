@@ -122,3 +122,6 @@ From DCF analysis:
 - Log Regr is better calibrated for different type of prior and has a wider range of values that can achieve good results
 - Linear SVM (k=1.0, C=1e-3, prior=0.5, grade=1.0, c=1) has less miscalibration than Log Regr with prior 0.5
 - RBF SVM 
+
+It is better to target the 0.1 prior application, because we know there are few pulsar
+From score analysis we get a threshold of -0.4
