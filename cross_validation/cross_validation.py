@@ -46,7 +46,9 @@ def shuffle_sample(
     s_features = []
     s_labels = []
     
-    sample_size = int(features.shape[1] / samples)
+    sample_size = int(features.shape[0] / samples)
+    if len(features.shape) > 1:
+        sample_size = int(features.shape[1] / samples)
     
     positive_size = int(sample_size * pos_perc)
     negative_size = sample_size - positive_size

@@ -5,8 +5,102 @@ import data_result_analysis as dra
 import matplotlib.pyplot as plt
 import models
 import numpy as np
-import preprocess as prep
+import preprocess as prep  
+    
+def svm_bayes_err_plot():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+    
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )   
+    
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                          kernel_type="radial basis function",
+                                          kernel_grade=10.0, pol_kernel_c=1.0)
+        svm.fit(tr_feat, tr_lab)
+        pred, scores = svm.predict(ts_feat, True)
+         
+        dra.bayes_error_plot(scores, ts_lab)
+    pass
+
+def svm_dcf():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+    
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+
+    dcf_5 = np.empty([k, 2])    
+    dcf_1 = np.empty([k, 2])    
+    dcf_9 = np.empty([k, 2])    
+
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )   
+    
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                          kernel_type="radial basis function",
+                                          kernel_grade=10.0, pol_kernel_c=1.0)
+        svm.fit(tr_feat, tr_lab)
+        pred, scores = svm.predict(ts_feat, True)
+        cm = dra.confusion_matrix(ts_lab, pred)
+        
+        dcf_5[i, 0] = dra.dcf(cm, 0.5, 1, 1) 
+        dcf_5[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
+        
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                          kernel_type="radial basis function",
+                                          kernel_grade=10.0, pol_kernel_c=1.0)
+        svm.set_threshold(-np.log(0.1/0.9))
+        svm.fit(tr_feat, tr_lab)
+        pred, scores = svm.predict(ts_feat, True)
+        cm = dra.confusion_matrix(ts_lab, pred)
+        
+        dcf_1[i, 0] = dra.dcf(cm, 0.1, 1, 1) 
+        dcf_1[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
+        
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                          kernel_type="radial basis function",
+                                          kernel_grade=10.0, pol_kernel_c=1.0)
+        svm.set_threshold(-np.log(0.9/0.1))
+        svm.fit(tr_feat, tr_lab)
+        pred, scores = svm.predict(ts_feat, True)
+        cm = dra.confusion_matrix(ts_lab, pred)
+
+        dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1)
+        dcf_9[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
+    pass
+
+def svm_roc():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+    
+    cms = []
+    t = np.linspace(-2, 2, 20)
+    
+    svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+                                      kernel_grade=1.0, pol_kernel_c=1.0)
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )
+        cms.append([])
+        for j in range(t.shape[0]):
+            svm.set_threshold(t[j])
+            svm.fit(tr_feat, tr_lab)
+            pred, scores = svm.predict(ts_feat, True)
+            cms[i].append(dra.confusion_matrix(ts_lab, pred))
+        dra.roc_det_curves(cms[i])
+    pass
 
 def plot_risk():
     fig, ax = plt.subplots()
@@ -96,4 +190,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    print_min_risk()
+    svm_bayes_err_plot()

@@ -5,7 +5,7 @@ Created on Mon Jun  7 14:52:40 2021
 @author: DarthReca
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 from scipy.special import logsumexp
@@ -46,7 +46,14 @@ class GaussianMixtureModel:
         self.eigvals_bound = eigvals_bound
         self.displacement_factor = displacement_factor
         self.precision = precision
+        self.threshold = 0.0
 
+    def set_threshold(self, threshold: float) -> None:
+        self.threshold = threshold
+    
+    def set_prior(self, prior: float) -> None:
+        self.threshold = -np.log(prior/(1 - prior))
+        
     def _log_likelihood_sample(
         self, x: np.ndarray, mu: np.ndarray, sigma: np.ndarray
     ) -> float:
@@ -197,17 +204,25 @@ class GaussianMixtureModel:
             curr = features[:, labels == l]
             params = self._lbg(curr, num_gaussians)
             self.gaussian_mixtures.append(params)
+        pass
 
-    def predict(self, features: np.ndarray):
+    def predict(
+        self, features: np.ndarray, return_scores: bool = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """Predict labels for given features."""
         labels_count = len(self.gaussian_mixtures)
         log_densities = np.empty([labels_count, features.shape[1]])
         for l in range(labels_count):
-            gmm = self.gaussian_mixtures[l]
-            gmm_joints = self._log_joints_gmm(features, gmm)
-            gmm_marginals = logsumexp(gmm_joints, axis=0)
-            log_densities[l] = gmm_marginals
-        joints = log_densities + np.log(1 / 3)
+            gm = self.gaussian_mixtures[l]
+            gm_joints = self._log_joints_gmm(features, gm)
+            gm_marginals = logsumexp(gm_joints, axis=0)
+            log_densities[l] = gm_marginals
+        ratio = log_densities[1] / log_densities[0]
+        pred = (ratio >= self.threshold).astype(np.int32)
+        joints = log_densities + np.log(0.5)
         marginal = logsumexp(joints, axis=0)
         joints -= marginal
-        return joints.argmax(axis=0)
+        pred1 = joints.argmax(axis=0)
+        if return_scores:
+            return pred, ratio
+        return pred
