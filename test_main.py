@@ -20,9 +20,9 @@ def main():
     
     train_f = pp.apply_all_preprocess(train_f)
     
-    gm = models.LogisticRegression(1e-5, 0.5)
+    gm = models.LogisticRegression(1e-5, 0.1)
     
-    gm.set_threshold(-1.67)
+    gm.set_threshold(-0.4)
     
     gm.fit(train_f, train_l)
     
