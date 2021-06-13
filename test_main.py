@@ -28,7 +28,7 @@ def main():
     #                                      kernel_type="polynomial",
     #                                      kernel_grade=1.0, pol_kernel_c=1.0)
     
-    # gm.set_threshold(-0.25)
+    gm.set_threshold(-0.25)
     # gm.set_threshold(-1.08)
     # gm.set_threshold(-1.05)
     
