@@ -10,6 +10,10 @@
 
 ## Notes
 
+### Target
+
+It is better to target the 0.1 prior application, because we know there are few pulsar
+
 ### Correlation
 
 - Using Pearson Correlation Coefficient we can see that before preprocessing there is correlation between data
@@ -42,20 +46,37 @@
 - Data of pulsar and non-pulsar are not well separated
 - Linear models will not achieve good result because they are not linearly separable
 
-### Linear Regression
+### Logistic Regression
 
 - Analizing the risk the natural choice seems $\lambda \to 0$
 
-*$\lambda = 1e-5$*
+$\lambda = 1e-5$, rebalanced 0.5
 
 | Method \ prior | 0.1   | 0.5   | 0.9   |
 | -------------- | ----- | ----- | ----- |
 | No prep        | 0.579 | 0.191 | 0.700 |
-| Prep           | 0.274 | 0.124 | 0.554 |
+| Prep           | 0.207 | 0.124 | 0.554 |
 | Gaussianized   | 0.440 | 0.173 | 0.464 |
 
-- Gaussianization is bad, Preprocessing is good
-- Linear Regression is better than MVG
+$\lambda = 1e-5$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.198 | 0.107 | 0.542 |
+| Gaussianized   | 0.194 | 0.104 | 0.503 |
+
+#### Quadratic Case
+
+- Natural choice seems $\lambda \to 0$
+
+$\lambda = 1e-5$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.195 | 0.108 | 0.481 |
+| Gaussianized   |       |       |       |
 
 ### Support Vector Machine
 
@@ -63,7 +84,7 @@
 
 - Analizing the risk the natural choice seems $C \to 0$ for preprocessed and gaussianized data
 
-$C = 1e-3$, rebalanced
+$C = 1e-3$, rebalanced 0.5
 
 | Method \ prior | 0.1   | 0.5   | 0.9   |
 | -------------- | ----- | ----- | ----- |
@@ -83,13 +104,34 @@ $C = 1e-3$, no rebalanced
 
 - Analizing the risk the natural choice seems $C \to 0$ for preprocessed and gaussianized data
 
-$C = 1e-3$, rebalanced
+$C = 1e-3$, rebalanced 0.5
 
 | Method \ prior | 0.1   | 0.5   | 0.9   |
 | -------------- | ----- | ----- | ----- |
 | No prep        |       |       |       |
 | Prep           | 0.203 | 0.110 | 0.489 |
 | Gaussianized   | 0.221 | 0.110 | 0.499 |
+
+$C = 1e-3$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.194 | 0.107 | 0.518 |
+| Gaussianized   |       |       |       |
+
+#### Cubic Case
+
+- Analizing the risk the natural choice seems $C \to 0$ 
+- From the table we don’t see improvements from quadratic model
+
+$C = 1e-3$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.198 | 0.109 | 0.622 |
+| Gaussianized   |       |       |       |
 
 #### RBF
 
@@ -111,9 +153,83 @@ $C = 1e-3, \gamma = 0.1$
 | Prep           | 0.290 | 0.150 | 0.537 |
 | Gaussianized   | 0.214 | 0.113 | 0.647 |
 
+- With prior for rebalancing 0.1
+
+$C=1e-3, \gamma = 10$
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.199 | 0.119 | 0.609 |
+| Gaussianized   | 0.912 | 0.391 | 0.898 |
+
+$C = 1e-3, \gamma = 0.1$
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.208 | 0.122 | 0.580 |
+| Gaussianized   | 0.204 | 0.123 | 0.577 |
+
+$C= 1e-3, \gamma = 100$
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.308 | 0.151 | 0.817 |
+| Gaussianized   |       |       |       |
+
+### Gaussian Mixture Model
+
+- Gaussianization doesn’t achieve good results in general
+- Preprocessing is useful only for prior 0.5 e 0.9
+- Gaussian Mixture Model is not benefiting from increasing the number of gaussians per class
+
+number of gaussian = 2
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.248 | 0.135 | 0.647 |
+| Prep           | 0.315 | 0.125 | 0.568 |
+| Gaussianized   | 0.840 | 0.277 | 0.680 |
+
+number of gaussian = 4
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.248 | 0.135 | 0.647 |
+| Prep           | 0.315 | 0.125 | 0.568 |
+| Gaussianized   | 0.840 | 0.277 | 0.680 |
+
+number of gaussian = 8
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.248 | 0.135 | 0.647 |
+| Prep           | 0.315 | 0.125 | 0.568 |
+| Gaussianized   | 0.840 | 0.277 | 0.680 |
+
+number of gaussian = 32
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.249 | 0.130 | 0.635 |
+| Prep           | 0.325 | 0.127 | 0.552 |
+| Gaussianized   |       |       |       |
+
+number of gaussian = 64
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.253 | 0.133 | 0.618 |
+| Prep           | 0.318 | 0.125 | 0.555 |
+| Gaussianized   | 0.741 | 0.315 | 0.741 |
+
 ## Roc Analysis
 
 Plotting the different ROCS of Logistic Regression, Linear SVM, Quadratic SVM -> Linear SVM is the most stable, Quadratic can sometimes achieve better results, also Logistic Regression can work well a little less than linear svm
+
+RBF SVM works better with gaussianized and can be good but seems there is some miscalibration
 
 ## Miscalibration Analysis
 
@@ -121,7 +237,9 @@ From DCF analysis:
 
 - Log Regr is better calibrated for different type of prior and has a wider range of values that can achieve good results
 - Linear SVM (k=1.0, C=1e-3, prior=0.5, grade=1.0, c=1) has less miscalibration than Log Regr with prior 0.5
-- RBF SVM 
+- RBF SVM is really miscalibrated
 
-It is better to target the 0.1 prior application, because we know there are few pulsar
-From score analysis we get a threshold of -0.4
+From score analysis:
+
+- Log Regr: we get a threshold of -0.4 / -0.25 (low acc, medium acc)
+- RBF SVM: we get -1.08

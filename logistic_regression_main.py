@@ -75,7 +75,7 @@ def log_regr_bayes_err_plot():
             sampled_f, sampled_l, i
         )   
     
-        log_reg = models.LogisticRegression(1e-5, 0.1)
+        log_reg = models.LogisticRegression(1e-5, 0.1, True)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -180,7 +180,7 @@ def analize_risk():
         # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         for j in range(20):
-            log_regr = models.LogisticRegression(lams[j], 0.5)
+            log_regr = models.LogisticRegression(lams[j], 0.1)
             log_regr.fit(tr_feat, tr_lab)
             pred, scores = log_regr.predict(ts_feat, True)
             low_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
@@ -199,8 +199,8 @@ def print_min_risk():
 
     
     low_lr = models.LogisticRegression(select_l, 0.1)
-    norm_lr = models.LogisticRegression(select_l, 0.5)
-    high_lr = models.LogisticRegression(select_l, 0.9)
+    #norm_lr = models.LogisticRegression(select_l, 0.5)
+    #high_lr = models.LogisticRegression(select_l, 0.9)
     
     min_dcf_1 = np.empty([k , 3])
     min_dcf_5 = np.empty([k , 3])
@@ -211,13 +211,16 @@ def print_min_risk():
             sampled_f, sampled_l, i
         )
         
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
         low_lr.fit(tr_feat, tr_lab)
-        norm_lr.fit(tr_feat, tr_lab)
-        high_lr.fit(tr_feat, tr_lab)
+        # norm_lr.fit(tr_feat, tr_lab)
+        # high_lr.fit(tr_feat, tr_lab)
         
         _, l_scores = low_lr.predict(ts_feat, True)
-        _, n_scores = norm_lr.predict(ts_feat, True)
-        _, h_scores = high_lr.predict(ts_feat, True)
+        # _, n_scores = norm_lr.predict(ts_feat, True)
+        # _, h_scores = high_lr.predict(ts_feat, True)
         
         # print("pi_t = 0.1")
         min_dcf_1[i, 0] = dra.min_norm_dcf(l_scores, ts_lab, 0.1, 1, 1)
@@ -225,6 +228,7 @@ def print_min_risk():
         min_dcf_1[i, 2] = dra.min_norm_dcf(l_scores, ts_lab, 0.9, 1, 1)
         
         # print("pi_t = 0.5")
+        """
         min_dcf_5[i, 0] = dra.min_norm_dcf(n_scores, ts_lab, 0.1, 1, 1)
         min_dcf_5[i, 1] = dra.min_norm_dcf(n_scores, ts_lab, 0.5, 1, 1)
         min_dcf_5[i, 2] = dra.min_norm_dcf(n_scores, ts_lab, 0.9, 1, 1)
@@ -233,7 +237,7 @@ def print_min_risk():
         min_dcf_9[i, 0] = dra.min_norm_dcf(h_scores, ts_lab, 0.1, 1, 1)
         min_dcf_9[i, 1] = dra.min_norm_dcf(h_scores, ts_lab, 0.5, 1, 1)
         min_dcf_9[i, 2] = dra.min_norm_dcf(h_scores, ts_lab, 0.9, 1, 1)
-        
+        """
     print("pi_t = 0.1")
     print("0.1, 0.5, 0.9", min_dcf_1.mean(axis=0))
     print("pi_t = 0.5")
@@ -243,4 +247,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    log_regr_bayes_err_plot()    
+    print_min_risk()    
