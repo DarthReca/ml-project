@@ -24,8 +24,8 @@ def analize_risk():
         (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(s_f, s_l, i)
         
         # Gaussianization doesn't reduce the risk
-        # tr_feat = prep.gaussianize(tr_feat)
-        # val_feat = prep.gaussianize(val_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        val_feat = prep.gaussianize(val_feat, tr_feat)
         
         model.set_prior(0.5)
         model.fit(tr_feat, tr_lab)

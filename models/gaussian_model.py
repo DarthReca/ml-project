@@ -139,7 +139,7 @@ class GaussianModel:
 
         """
         likelihood = self._log_likelihood(features)
-        ratio = likelihood[1, :] / likelihood[0, :]
+        ratio = likelihood[1, :] - likelihood[0, :]
         prediction = (ratio >= self.threshold).astype(np.int32)
         if return_scores:
             return prediction, ratio
