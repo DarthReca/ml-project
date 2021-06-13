@@ -217,12 +217,10 @@ class GaussianMixtureModel:
             gm_joints = self._log_joints_gmm(features, gm)
             gm_marginals = logsumexp(gm_joints, axis=0)
             log_densities[l] = gm_marginals
-        ratio = log_densities[1] / log_densities[0]
+            
+        ratio = log_densities[1] - log_densities[0]
         pred = (ratio >= self.threshold).astype(np.int32)
-        joints = log_densities + np.log(0.5)
-        marginal = logsumexp(joints, axis=0)
-        joints -= marginal
-        pred1 = joints.argmax(axis=0)
+
         if return_scores:
             return pred, ratio
         return pred
