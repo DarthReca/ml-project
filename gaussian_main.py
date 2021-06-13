@@ -10,7 +10,7 @@ def analize_risk():
     train_features, train_labels = dl.load_train_data()
     
     # Preprocess reduce the risk
-    train_features = prep.apply_all_preprocess(train_features)
+    # train_features = prep.apply_all_preprocess(train_features)
 
     s_f, s_l = cv.shuffle_sample(train_features, train_labels, 5)
     
@@ -27,19 +27,12 @@ def analize_risk():
         # tr_feat = prep.gaussianize(tr_feat)
         # val_feat = prep.gaussianize(val_feat, tr_feat)
         
-        model.set_prior(0.5)
-        model.fit(tr_feat, tr_lab)
-        pred, scores = model.predict(val_feat, True)
-        norm_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
-        
         model.set_prior(0.1)
         model.fit(tr_feat, tr_lab)
         pred, scores = model.predict(val_feat, True)
+       
+        norm_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
         low_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
-        
-        model.set_prior(0.9)
-        model.fit(tr_feat, tr_lab)
-        pred, scores = model.predict(val_feat, True)
         high_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
     pass
 

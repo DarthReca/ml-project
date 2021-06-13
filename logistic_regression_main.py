@@ -199,8 +199,6 @@ def print_min_risk():
 
     
     low_lr = models.LogisticRegression(select_l, 0.1)
-    #norm_lr = models.LogisticRegression(select_l, 0.5)
-    #high_lr = models.LogisticRegression(select_l, 0.9)
     
     min_dcf_1 = np.empty([k , 3])
     min_dcf_5 = np.empty([k , 3])
@@ -215,29 +213,13 @@ def print_min_risk():
         # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         low_lr.fit(tr_feat, tr_lab)
-        # norm_lr.fit(tr_feat, tr_lab)
-        # high_lr.fit(tr_feat, tr_lab)
-        
         _, l_scores = low_lr.predict(ts_feat, True)
-        # _, n_scores = norm_lr.predict(ts_feat, True)
-        # _, h_scores = high_lr.predict(ts_feat, True)
         
         # print("pi_t = 0.1")
         min_dcf_1[i, 0] = dra.min_norm_dcf(l_scores, ts_lab, 0.1, 1, 1)
         min_dcf_1[i, 1] = dra.min_norm_dcf(l_scores, ts_lab, 0.5, 1, 1)
         min_dcf_1[i, 2] = dra.min_norm_dcf(l_scores, ts_lab, 0.9, 1, 1)
         
-        # print("pi_t = 0.5")
-        """
-        min_dcf_5[i, 0] = dra.min_norm_dcf(n_scores, ts_lab, 0.1, 1, 1)
-        min_dcf_5[i, 1] = dra.min_norm_dcf(n_scores, ts_lab, 0.5, 1, 1)
-        min_dcf_5[i, 2] = dra.min_norm_dcf(n_scores, ts_lab, 0.9, 1, 1)
-
-        # print("pi_t = 0.9")
-        min_dcf_9[i, 0] = dra.min_norm_dcf(h_scores, ts_lab, 0.1, 1, 1)
-        min_dcf_9[i, 1] = dra.min_norm_dcf(h_scores, ts_lab, 0.5, 1, 1)
-        min_dcf_9[i, 2] = dra.min_norm_dcf(h_scores, ts_lab, 0.9, 1, 1)
-        """
     print("pi_t = 0.1")
     print("0.1, 0.5, 0.9", min_dcf_1.mean(axis=0))
     print("pi_t = 0.5")
