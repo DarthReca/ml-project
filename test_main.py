@@ -14,15 +14,23 @@ import data_plotting as dp
 def main():
     features, labels = dl.load_test_data()
     
-    features = pp.apply_all_preprocess(features)
+    features = pp.apply_all_preprocess(features)    
     
     train_f, train_l = dl.load_train_data()
     
     train_f = pp.apply_all_preprocess(train_f)
+    train_f = pp.gaussianize(train_f) 
+    features = pp.gaussianize(features, train_f)
     
     gm = models.LogisticRegression(1e-5, 0.1)
     
-    gm.set_threshold(-0.4)
+    # gm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
+    #                                      kernel_type="polynomial",
+    #                                      kernel_grade=1.0, pol_kernel_c=1.0)
+    
+    # gm.set_threshold(-0.25)
+    # gm.set_threshold(-1.08)
+    # gm.set_threshold(-1.05)
     
     gm.fit(train_f, train_l)
     

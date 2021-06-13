@@ -61,8 +61,11 @@ def scatter_attributes(features: np.ndarray, labels: np.ndarray) -> None:
 
     """
     features_count = features.shape[0]
+    combinations = list(it.combinations(range(features_count), 2))
 
-    for c in list(it.combinations(range(features_count), 2)):
+
+
+    for c in combinations:
         _, ax = plt.subplots()
 
         true_features = features[:, labels == 1]

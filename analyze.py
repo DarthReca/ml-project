@@ -53,6 +53,13 @@ def analize_gaussianization():
     gaussianized = prep.gaussianize(preprocessed)
     dp.plot_attributes(gaussianized, labels)
 
+def analize_features_separation():
+    features, labels = dl.load_train_data()
+    features = prep.apply_all_preprocess(features)
+    
+    dp.scatter_attributes(features, labels)
+
+
 def analize_rocs():
     # Remember to load saved_data/conf_m_comparison
     fprs0 = []
@@ -110,4 +117,4 @@ def analize_rocs():
 
 
 if __name__ == "__main__":
-    analize_rocs()
+    analize_features_separation()
