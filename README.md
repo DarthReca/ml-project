@@ -21,30 +21,27 @@ It is better to target the 0.1 prior application, because we know there are few 
 
 ### Gaussian Model
 
-| Method \ prior | 0.1  | 0.5   | 0.9   |
-| -------------- | ---- | ----- | ----- |
-| No prep        | 1.0  | 1.0   | 1.055 |
-| Prep           | 1.0  | 0.613 | 0.771 |
-| Gaussianized   | 1.0  | 1.0   | 1.055 |
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.266 | 0.139 | 0.629 |
+| Prep           | 0.330 | 0.139 | 0.589 |
+| Gaussianized   | 0.234 | 0.130 | 0.552 |
 
-*Naive*
+*Naive* 
 
-| Method \ prior | 0.1  | 0.5  | 0.9   |
-| -------------- | ---- | ---- | ----- |
-| No prep        | 1.0  | 1.0  | 1.055 |
-| Prep           | 1.0  | 1.0  | 1.055 |
-| Gaussianized   | 1.0  | 1.0  | 1.055 |
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.304 | 0.182 | 0.667 |
+| Prep           | 0.243 | 0.133 | 0.589 |
+| Gaussianized   | 0.213 | 0.113 | 0.541 |
 
 *Tied covariance*
 
-| Method \ prior | 0.1  | 0.5   | 0.9   |
-| -------------- | ---- | ----- | ----- |
-| No prep        | 1.0  | 1.0   | 1.055 |
-| Prep           | 1.0  | 0.997 | 1.008 |
-| Gaussianized   | 1.0  | 0.999 | 1.055 |
-
-- Data of pulsar and non-pulsar are not well separated
-- Linear models will not achieve good result because they are not linearly separable
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.213 | 0.106 | 0.501 |
+| Prep           | 0.213 | 0.122 | 0.547 |
+| Gaussianized   | 0.213 | 0.106 | 0.500 |
 
 ### Logistic Regression
 

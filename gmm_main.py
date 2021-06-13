@@ -24,7 +24,7 @@ def analize_risk():
     low_dcf = np.empty([5, 1])
     high_dcf = np.empty([5, 1])
     
-    gaussians = np.array([32])
+    gaussians = np.array([2])
     
     model = models.GaussianMixtureModel(precision=1e-2)
     for i in range(5):
@@ -36,19 +36,12 @@ def analize_risk():
         for j in range(gaussians.shape[0]):
             n = 4
             
-            model.set_prior(0.5)
-            model.fit(tr_feat, tr_lab, n,2)
-            pred, scores = model.predict(val_feat, True)
-            norm_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
-            
             model.set_prior(0.1)
-            model.fit(tr_feat, tr_lab, n ,2)
-            pred, scores = model.predict(val_feat, True)
-            low_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
-            
-            model.set_prior(0.9)
             model.fit(tr_feat, tr_lab, n,2)
             pred, scores = model.predict(val_feat, True)
+            
+            norm_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
+            low_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
             high_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
     pass
 
