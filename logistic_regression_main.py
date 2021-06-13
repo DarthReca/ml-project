@@ -28,7 +28,7 @@ def calibrate_score():
             sampled_f, sampled_l, i
         )  
         
-        log_reg = models.LogisticRegression(1e-5, 0.1)
+        log_reg = models.LogisticRegression(1e-5, 0.1, True)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -75,7 +75,7 @@ def log_regr_bayes_err_plot():
             sampled_f, sampled_l, i
         )   
     
-        log_reg = models.LogisticRegression(1e-5, 0.1, True)
+        log_reg = models.LogisticRegression(1e-5, 0.1)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -131,8 +131,8 @@ def log_regr_roc():
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    t = np.linspace(-15, 15, 20)
-    log_regr = models.LogisticRegression(1e-5, 0.5)
+    t = np.linspace(-15, 15, 10)
+    log_regr = models.LogisticRegression(1e-5, 0.1)
     cms = []
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
@@ -165,11 +165,11 @@ def analize_risk():
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    lams = np.linspace(1e-5, 1e5, 20)
+    lams = np.linspace(0, 1e-4, 10)
 
-    low_dcf = np.empty([k, 20])
-    norm_dcf = np.empty([k, 20])
-    high_dcf = np.empty([k, 20])
+    low_dcf = np.empty([k, 10])
+    norm_dcf = np.empty([k, 10])
+    high_dcf = np.empty([k, 10])
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
@@ -179,7 +179,7 @@ def analize_risk():
         # tr_feat = prep.gaussianize(tr_feat)
         # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
-        for j in range(20):
+        for j in range(10):
             log_regr = models.LogisticRegression(lams[j], 0.1)
             log_regr.fit(tr_feat, tr_lab)
             pred, scores = log_regr.predict(ts_feat, True)
@@ -247,4 +247,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    print_min_risk()    
+    calibrate_score()    
