@@ -30,6 +30,9 @@ def calibrate_score():
         
         log_reg = models.LogisticRegression(1e-5, 0.1)
         
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
         
@@ -99,32 +102,26 @@ def log_regr_dcf():
     dcf_1 = np.empty([k, 2])    
     dcf_9 = np.empty([k, 2])    
     
+    log_regr = models.LogisticRegression(1e-5, 0.1)
+    
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
-        log_regr = models.LogisticRegression(1e-5, 0.5)
-        log_regr.set_threshold(0.0)
         log_regr.fit(tr_feat, tr_lab)
+        
         pred, scores = log_regr.predict(ts_feat, True)
         cm = dra.confusion_matrix(ts_lab, pred)
+        
         dcf_5[i, 0] = dra.dcf(cm, 0.5, 1, 1) 
         dcf_5[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
 
-        log_regr = models.LogisticRegression(1e-5, 0.1)
-        log_regr.set_threshold(-np.log(0.1/0.9))
-        log_regr.fit(tr_feat, tr_lab)
-        pred, scores = log_regr.predict(ts_feat, True)
-        cm = dra.confusion_matrix(ts_lab, pred)
         dcf_1[i, 0] = dra.dcf(cm, 0.1, 1, 1) 
         dcf_1[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
 
-        log_regr = models.LogisticRegression(1e-5, 0.9)
-        log_regr.set_threshold(-np.log(0.9/0.1))
-        log_regr.fit(tr_feat, tr_lab)
-        pred, scores = log_regr.predict(ts_feat, True)
-        cm = dra.confusion_matrix(ts_lab, pred)
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1) 
         dcf_9[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
     pass
@@ -135,13 +132,15 @@ def log_regr_roc():
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    t = np.linspace(-15, 15, 10)
+    t = np.linspace(-9, 1, 10)
     log_regr = models.LogisticRegression(1e-5, 0.1)
     cms = []
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         cms.append([])
         for j in range(t.shape[0]):
             log_regr.set_threshold(t[j])
@@ -198,11 +197,11 @@ def print_min_risk():
 
     features, labels = dl.load_train_data()
     # Some benefits only for pi = 0.9
-    # features = prep.apply_all_preprocess(features)
+    features = prep.apply_all_preprocess(features)
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     
-    low_lr = models.LogisticRegression(select_l, 0.1, True)
+    low_lr = models.LogisticRegression(select_l, 0.1)
     
     min_dcf_1 = np.empty([k , 3])
     min_dcf_5 = np.empty([k , 3])
@@ -229,4 +228,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    print_min_risk()    
+    calibrate_score()    

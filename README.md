@@ -248,3 +248,27 @@ From score analysis:
 
 - Log Regr: we get a threshold of -0.4 / -0.25 (low acc, medium acc)
 - RBF SVM: we get -1.08
+
+Prior 0.1
+
+| Model               | min DCF | DCF with theoretical threshold | DCF with estimated threshold | threshold           |
+| ------------------- | ------- | ------------------------------ | ---------------------------- | ------------------- |
+| Quadratic SVM Prep  | 0.205   | 1.0                            | 0.237                        | -0.8493689904960244 |
+| Linear Log Reg Prep | 0.203   | 0.295                          | 0.211                        | -0.2023909147748068 |
+
+Logistic regression is better calibrated so it is better to choose this model.
+
+## Extra Step
+
+This data are collected improving precision of the model to 1e7 instead of 1e12
+
+$\lambda = 1e-5$, rebalanced 0.1
+
+| Method \ prior | 0.1  | 0.5  | 0.9  |
+| -------------- | ---- | ---- | ---- |
+| No prep        |      |      |      |
+| Prep           |      |      |      |
+| Gaussianized   |      |      |      |
+
+ 
+
