@@ -73,7 +73,7 @@ $\lambda = 1e-5$, rebalanced 0.1
 | -------------- | ----- | ----- | ----- |
 | No prep        |       |       |       |
 | Prep           | 0.195 | 0.108 | 0.481 |
-| Gaussianized   |       |       |       |
+| Gaussianized   | 0.222 | 0.119 | 0.545 |
 
 ### Support Vector Machine
 
@@ -121,9 +121,9 @@ $C = 1e-3$, rebalanced 0.1
 
 | Method \ prior | 0.1   | 0.5   | 0.9   |
 | -------------- | ----- | ----- | ----- |
-| No prep        |       |       |       |
+| No prep        | 0.297 | 0.160 | 0.781 |
 | Prep           | 0.194 | 0.107 | 0.518 |
-| Gaussianized   |       |       |       |
+| Gaussianized   | 0.206 | 0.118 | 0.535 |
 
 #### Cubic Case
 
