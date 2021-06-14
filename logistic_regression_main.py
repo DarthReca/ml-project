@@ -28,7 +28,7 @@ def calibrate_score():
             sampled_f, sampled_l, i
         )  
         
-        log_reg = models.LogisticRegression(1e-5, 0.1, True)
+        log_reg = models.LogisticRegression(1e-5, 0.1)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -58,7 +58,11 @@ def calibrate_score():
     pred_s = (val_scores >= selected_thresh).astype(np.int32)
     cm = dra.confusion_matrix(val_slab, pred_s)
     
-    print(dra.dcf(cm, 0.1, 1, 1))
+    pred_s_theo = (val_scores >= -np.log(0.1/0.9)).astype(np.int32)
+    cm_t = dra.confusion_matrix(val_slab, pred_s_theo)
+    
+    print("Threorethical threshold dcf: ", dra.dcf(cm_t, 0.1, 1, 1))
+    print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
     print(dra.min_norm_dcf(scores, scores_labs, 0.1, 1, 1))
     pass        
@@ -194,11 +198,11 @@ def print_min_risk():
 
     features, labels = dl.load_train_data()
     # Some benefits only for pi = 0.9
-    features = prep.apply_all_preprocess(features)
+    # features = prep.apply_all_preprocess(features)
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     
-    low_lr = models.LogisticRegression(select_l, 0.1)
+    low_lr = models.LogisticRegression(select_l, 0.1, True)
     
     min_dcf_1 = np.empty([k , 3])
     min_dcf_5 = np.empty([k , 3])
@@ -222,11 +226,7 @@ def print_min_risk():
         
     print("pi_t = 0.1")
     print("0.1, 0.5, 0.9", min_dcf_1.mean(axis=0))
-    print("pi_t = 0.5")
-    print("0.1, 0.5, 0.9", min_dcf_5.mean(axis=0))
-    print("pi_t = 0.9")
-    print("0.1, 0.5, 0.9", min_dcf_9.mean(axis=0))
 
 
 if __name__ == '__main__':
-    plot_risk()    
+    print_min_risk()    

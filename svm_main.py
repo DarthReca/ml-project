@@ -20,12 +20,12 @@ def calibrate_score():
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                           kernel_type="polynomial",
-                                          kernel_grade=1.0, pol_kernel_c=1.0)
+                                          kernel_grade=2.0, pol_kernel_c=1.0)
         
         svm.fit(tr_feat, tr_lab)
         pred, scores = svm.predict(ts_feat, True)
@@ -55,7 +55,11 @@ def calibrate_score():
     pred_s = (val_scores >= selected_thresh).astype(np.int32)
     cm = dra.confusion_matrix(val_slab, pred_s)
     
-    print(dra.dcf(cm, 0.1, 1, 1))
+    pred_s_theo = (val_scores >= -np.log(0.1/0.9)).astype(np.int32)
+    cm_t = dra.confusion_matrix(val_slab, pred_s_theo)
+    
+    print("Threorethical threshold", dra.dcf(cm_t, 0.1, 1, 1))
+    print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
     print(dra.min_norm_dcf(scores, scores_labs, 0.1, 1, 1))
     pass 
@@ -144,8 +148,8 @@ def svm_roc():
     t = np.linspace(-1.5, -0.5, 20)
     
     svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
-                                      kernel_type="radial basis function",
-                                      kernel_grade=10, pol_kernel_c=1.0)
+                                      kernel_type="polynomial",
+                                      kernel_grade=2, pol_kernel_c=1.0)
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
@@ -177,7 +181,7 @@ def plot_risk():
 
 def analize_risk_C():
     features, labels = dl.load_train_data()
-    # features = prep.apply_all_preprocess(features)
+    features = prep.apply_all_preprocess(features)
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -198,8 +202,8 @@ def analize_risk_C():
         )
 
         # Not so useful
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
 
         for j in range(10):
             svm = models.SupportVectorMachine(
@@ -218,8 +222,8 @@ def analize_risk_C():
 def print_min_risk():
     features, labels = dl.load_train_data()
 
-    # features = prep.apply_all_preprocess(features)
-    grade = 1.0
+    features = prep.apply_all_preprocess(features)
+    grade = 2.0
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -236,8 +240,8 @@ def print_min_risk():
             sampled_f, sampled_l, i
         )
         # Not so useful
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
 
         svm.fit(tr_feat, tr_lab)
         pred, scores = svm.predict(ts_feat, True)
@@ -252,4 +256,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    analize_risk_C()
+    calibrate_score()
