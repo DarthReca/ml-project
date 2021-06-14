@@ -177,14 +177,14 @@ def plot_risk():
 
 def analize_risk_C():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
+    # features = prep.apply_all_preprocess(features)
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     C = np.linspace(1e-3, 1e2, 10)
     # Tested Pol: 1.0, 2.0
-    grade = 3.0
+    grade = 2.0
     # Tested RBF: 0.1, 1.0, 10
     gamma = 10
 
@@ -218,8 +218,8 @@ def analize_risk_C():
 def print_min_risk():
     features, labels = dl.load_train_data()
 
-    features = prep.apply_all_preprocess(features)
-    grade = 3
+    # features = prep.apply_all_preprocess(features)
+    grade = 1.0
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -228,7 +228,7 @@ def print_min_risk():
     min_dcf_5 = np.empty(k)
     min_dcf_9 = np.empty(k)
     svm = models.SupportVectorMachine(
-        kernel_type="radial basis function",
+        kernel_type="polynomial",
         k=1, C=1e-3, prior_true=0.1, kernel_grade=grade, pol_kernel_c=1.0
     )
     for i in range(k):
@@ -252,4 +252,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    calibrate_score()
+    analize_risk_C()

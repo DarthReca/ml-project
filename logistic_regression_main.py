@@ -165,7 +165,7 @@ def analize_risk():
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    lams = np.linspace(0, 1e-4, 10)
+    lams = np.linspace(1e-5, 1e5, 10)
 
     low_dcf = np.empty([k, 10])
     norm_dcf = np.empty([k, 10])
@@ -176,8 +176,8 @@ def analize_risk():
         )
         
         # Gaussianization doesn't reduce the risk
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         for j in range(10):
             log_regr = models.LogisticRegression(lams[j], 0.1)
@@ -229,4 +229,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    calibrate_score()    
+    plot_risk()    

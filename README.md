@@ -89,6 +89,14 @@ $C = 1e-3$, rebalanced 0.5
 | Prep           | 0.226 | 0.110 | 0.517 |
 | Gaussianized   | 0.202 | 0.111 | 0.531 |
 
+$C = 1e-3$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.288 | 0.160 | 0.741 |
+| Prep           | 0.244 | 0.149 | 0.658 |
+| Gaussianized   | 0.223 | 0.148 | 0.706 |
+
 $C = 1e-3$, no rebalanced
 
 | Method \ prior | 0.1   | 0.5   | 0.9   |
