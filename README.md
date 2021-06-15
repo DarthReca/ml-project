@@ -284,7 +284,7 @@ Logistic Regression - Lambda 0, 1e-5
 
 Prep
 
-Threshold -0.025
+Threshold -0.141
 
 # Verification on Test Set
 
