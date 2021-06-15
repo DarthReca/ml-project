@@ -28,10 +28,10 @@ def calibrate_score():
             sampled_f, sampled_l, i
         )  
         
-        log_reg = models.LogisticRegression(1e-5, 0.1)
+        log_reg = models.LogisticRegression(0, 0.1)
         
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -67,7 +67,7 @@ def calibrate_score():
     print("Threorethical threshold dcf: ", dra.dcf(cm_t, 0.1, 1, 1))
     print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
-    print(dra.min_norm_dcf(scores, scores_labs, 0.1, 1, 1))
+    print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
     pass        
 
 def log_regr_bayes_err_plot():
@@ -108,8 +108,8 @@ def log_regr_dcf():
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         log_regr.fit(tr_feat, tr_lab)
         
@@ -132,15 +132,15 @@ def log_regr_roc():
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    t = np.linspace(-9, 1, 10)
-    log_regr = models.LogisticRegression(1e-5, 0.1)
+    t = np.linspace(-15, 15, 20)
+    log_regr = models.LogisticRegression(0, 0.1)
     cms = []
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         cms.append([])
         for j in range(t.shape[0]):
             log_regr.set_threshold(t[j])
@@ -192,14 +192,14 @@ def analize_risk():
     pass
 
 def print_min_risk():
-    select_l = 1e-5
+    select_l = 0
     k = 5
 
     features, labels = dl.load_train_data()
     # Some benefits only for pi = 0.9
     features = prep.apply_all_preprocess(features)
+    
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-
     
     low_lr = models.LogisticRegression(select_l, 0.1)
     

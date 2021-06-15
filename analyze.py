@@ -46,12 +46,12 @@ def analize_class_correlation():
 def analize_gaussianization():
     features, labels = dl.load_train_data()
 
-    gaussianized = prep.gaussianize(features)
-    dp.plot_attributes(gaussianized, labels)
+    # gaussianized = prep.gaussianize(features)
+    # dp.plot_attributes(gaussianized, labels)
     
     preprocessed = prep.apply_all_preprocess(features)
-    gaussianized = prep.gaussianize(preprocessed)
-    dp.plot_attributes(gaussianized, labels)
+    # gaussianized = prep.gaussianize(preprocessed)
+    dp.plot_attributes(preprocessed, labels)
 
 def analize_features_separation():
     features, labels = dl.load_train_data()
@@ -117,4 +117,4 @@ def analize_rocs():
 
 
 if __name__ == "__main__":
-    analize_features_separation()
+    analize_gaussianization()

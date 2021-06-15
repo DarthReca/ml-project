@@ -76,12 +76,12 @@ def svm_bayes_err_plot():
             sampled_f, sampled_l, i
         )   
         
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
     
         svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                           kernel_type="polynomial",
-                                          kernel_grade=1.0, pol_kernel_c=1.0)
+                                          kernel_grade=2.0, pol_kernel_c=1.0)
         svm.fit(tr_feat, tr_lab)
         pred, scores = svm.predict(ts_feat, True)
          
@@ -104,35 +104,19 @@ def svm_dcf():
             sampled_f, sampled_l, i
         )   
     
-        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                           kernel_type="polynomial",
-                                          kernel_grade=1.0, pol_kernel_c=1.0)
+                                          kernel_grade=2.0, pol_kernel_c=1.0)
         svm.fit(tr_feat, tr_lab)
         pred, scores = svm.predict(ts_feat, True)
         cm = dra.confusion_matrix(ts_lab, pred)
         
         dcf_5[i, 0] = dra.dcf(cm, 0.5, 1, 1) 
         dcf_5[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
-        
-        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
-                                          kernel_type="radial basis function",
-                                          kernel_grade=10.0, pol_kernel_c=1.0)
-        svm.set_threshold(-np.log(0.1/0.9))
-        svm.fit(tr_feat, tr_lab)
-        pred, scores = svm.predict(ts_feat, True)
-        cm = dra.confusion_matrix(ts_lab, pred)
-        
+
         dcf_1[i, 0] = dra.dcf(cm, 0.1, 1, 1) 
         dcf_1[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
         
-        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.5,
-                                          kernel_type="radial basis function",
-                                          kernel_grade=10.0, pol_kernel_c=1.0)
-        svm.set_threshold(-np.log(0.9/0.1))
-        svm.fit(tr_feat, tr_lab)
-        pred, scores = svm.predict(ts_feat, True)
-        cm = dra.confusion_matrix(ts_lab, pred)
-
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1)
         dcf_9[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
     pass

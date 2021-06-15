@@ -99,7 +99,7 @@ class LogisticRegression:
             x0,
             args=[mapped, labels],
             approx_grad=True,
-            factr=1e12
+            factr=1e7
         )
 
     def set_threshold(self, threshold: float):

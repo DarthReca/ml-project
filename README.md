@@ -256,7 +256,7 @@ Prior 0.1
 | Quadratic SVM Prep  | 0.205   | 1.0                            | 0.237                        | -0.8493689904960244 |
 | Linear Log Reg Prep | 0.203   | 0.295                          | 0.211                        | -0.2023909147748068 |
 
-Logistic regression is better calibrated so it is better to choose this model.
+Logistic regression is better calibrated so it is better to choose this model and from ROC we see that we can achieve the same results of a Quadratic SVM or something a bit better
 
 ## Extra Step
 
@@ -264,11 +264,147 @@ This data are collected improving precision of the model to 1e7 instead of 1e12
 
 $\lambda = 1e-5$, rebalanced 0.1
 
-| Method \ prior | 0.1  | 0.5  | 0.9  |
-| -------------- | ---- | ---- | ---- |
-| No prep        |      |      |      |
-| Prep           |      |      |      |
-| Gaussianized   |      |      |      |
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.201 | 0.105 | 0.501 |
+| Gaussianized   | 0.195 | 0.104 | 0.526 |
 
- 
+$\lambda = 0$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.197 | 0.107 | 0.524 |
+| Gaussianized   | 0.201 | 0.109 | 0.538 |
+
+## Choosen Model
+
+Logistic Regression - Lambda 0, 1e-5
+
+Prep
+
+Threshold -0.025
+
+# Verification on Test Set
+
+### Gaussian Model
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.278 | 0.139 | 0.539 |
+| Prep           | 0.342 | 0.146 | 0.586 |
+| Gaussianized   | 0.240 | 0.125 | 0.535 |
+
+*Naive* 
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.326 | 0.178 | 0.609 |
+| Prep           | 0.245 | 0.123 | 0.566 |
+| Gaussianized   | 0.215 | 0.116 | 0.523 |
+
+*Tied covariance*
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.200 | 0.110 | 0.501 |
+| Prep           | 0.229 | 0.121 | 0.561 |
+| Gaussianized   | 0.250 | 0.179 | 0.737 |
+
+### Logistic Regression
+
+#### Linear case
+
+$\lambda = 1e-5$, rebalanced 0.1, precision 1e7
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.192 | 0.107 | 0.504 |
+| Gaussianized   | 0.190 | 0.112 | 0.528 |
+
+$\lambda = 0$, rebalanced 0.1, precision 1e7
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.192 | 0.104 | 0.509 |
+| Gaussianized   | 0.199 | 0.108 | 0.474 |
+
+
+
+### Support Vector Machine
+
+#### Linear Case
+
+$C = 1e-3$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.289 | 0.159 | 0.686 |
+| Prep           | 0.246 | 0.157 | 0.670 |
+| Gaussianized   | 0.234 | 0.160 | 0.665 |
+
+#### Quadratic case
+
+$C = 1e-3$, rebalanced 0.1
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.297 | 0.165 | 0.717 |
+| Prep           | 0.194 | 0.105 | 0.542 |
+| Gaussianized   | 0.207 | 0.111 | 0.544 |
+
+#### RBF
+
+$C=1e-3, \gamma = 10$
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        |       |       |       |
+| Prep           | 0.201 | 0.112 | 0.645 |
+| Gaussianized   | 0.912 | 0.427 | 0.927 |
+
+### Gaussian Mixture Model
+
+number of gaussian = 4
+
+| Method \ prior | 0.1   | 0.5   | 0.9   |
+| -------------- | ----- | ----- | ----- |
+| No prep        | 0.267 | 0.140 | 0.577 |
+| Prep           | 0.309 | 0.126 | 0.484 |
+| Gaussianized   | 0.762 | 0.270 | 0.667 |
+
+
+
+#### Various Threshold and DCF
+
+Test Set Prep Log Regr
+
+| Threshold | MIN DCF | DCF   |
+| --------- | ------- | ----- |
+| -0.458    | 0.198   | 0.207 |
+| -0.728    | 0.199   | 0.230 |
+| -0.386    | 0.190   | 0.192 |
+| 0.042     | 0.207   | 0.220 |
+
+Train Set Prep Log Regr
+
+| Threshold | MIN DCF | DCF   |
+| --------- | ------- | ----- |
+| -0.424    | 0.200   | 0.217 |
+| -0.013    | 0.208   | 0.213 |
+| -0.181    | 0.213   | 0.220 |
+| -0.141    | 0.185   | 0.185 |
+| -0.178    | 0.206   | 0.210 |
+
+Train Set Gauss Log Regr
+
+| Threshold | MIN DCF | DCF   |
+| --------- | ------- | ----- |
+| -4.13     | 0.212   | 0.223 |
+| -4.10     | 0.198   | 0.200 |
+| -4.08     | 0.207   | 0.232 |
+| -4.06     | 0.215   | 0.224 |
 
