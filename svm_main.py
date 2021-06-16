@@ -207,7 +207,7 @@ def print_min_risk():
     features, labels = dl.load_train_data()
 
     features = prep.apply_all_preprocess(features)
-    grade = 2.0
+    grade = 1.0
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -216,7 +216,7 @@ def print_min_risk():
     min_dcf_5 = np.empty(k)
     min_dcf_9 = np.empty(k)
     svm = models.SupportVectorMachine(
-        kernel_type="polynomial",
+        kernel_type="radial basis function",
         k=1, C=1e-3, prior_true=0.1, kernel_grade=grade, pol_kernel_c=1.0
     )
     for i in range(k):
@@ -240,4 +240,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    calibrate_score()
+    svm_dcf()

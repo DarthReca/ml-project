@@ -17,7 +17,7 @@ def analize_risk():
     train_features, train_labels = dl.load_train_data()
     
     # Preprocess is useless
-    # train_features = prep.apply_all_preprocess(train_features)
+    train_features = prep.apply_all_preprocess(train_features)
 
     s_f, s_l = cv.shuffle_sample(train_features, train_labels, 5)
     model = models.GaussianModel(0.0)
@@ -40,7 +40,10 @@ def analize_risk():
         norm_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
         low_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
         high_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
+    
+    print("0.1 = ", low_dcf.mean(axis=0)) 
+    print("0.5 = ", norm_dcf.mean(axis=0))
+    print("0.9 =", high_dcf.mean(axis=0))
 
 if __name__ == "__main__":
     analize_risk()

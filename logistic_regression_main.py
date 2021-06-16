@@ -132,15 +132,15 @@ def log_regr_roc():
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    t = np.linspace(-15, 15, 20)
+    t = np.linspace(-9, 1, 20)
     log_regr = models.LogisticRegression(0, 0.1)
     cms = []
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         cms.append([])
         for j in range(t.shape[0]):
             log_regr.set_threshold(t[j])
@@ -192,12 +192,12 @@ def analize_risk():
     pass
 
 def print_min_risk():
-    select_l = 0
+    select_l = 1e-5
     k = 5
 
     features, labels = dl.load_train_data()
     # Some benefits only for pi = 0.9
-    features = prep.apply_all_preprocess(features)
+    # features = prep.apply_all_preprocess(features)
     
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
     
@@ -228,4 +228,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    calibrate_score()    
+    log_regr_roc()    
