@@ -61,7 +61,7 @@ def calibrate_score():
     print("Threorethical threshold", dra.dcf(cm_t, 0.1, 1, 1))
     print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
-    print(dra.min_norm_dcf(scores, scores_labs, 0.1, 1, 1))
+    print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
     pass 
 
 def svm_bayes_err_plot():
@@ -240,4 +240,4 @@ def print_min_risk():
 
 
 if __name__ == "__main__":
-    svm_dcf()
+    calibrate_score()

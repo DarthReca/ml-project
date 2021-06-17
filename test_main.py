@@ -165,11 +165,11 @@ def log_regr_lambda_estimation():
         )
         
         # Gaussianization doesn't reduce the risk
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         for j in range(10):
-            log_regr = models.LogisticRegression(lams[j], 0.1)
+            log_regr = models.LogisticRegression(lams[j], 0.5)
             log_regr.fit(tr_feat, tr_lab)
             pred, scores = log_regr.predict(ts_feat, True)
             low_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
@@ -199,9 +199,56 @@ def log_regr_roc():
             pred, score = log_regr.predict(ts_feat, True)
             cms[i].append(dra.confusion_matrix(ts_lab, pred))
         dra.roc_det_curves(cms[i])
+    pass 
+
+def log_regr_bayes_err_plot():
+    features, labels = dl.load_test_data()
+    features = prep.apply_all_preprocess(features)
+    
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )   
+    
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
+        log_reg = models.LogisticRegression(0, 0.1)
+        
+        log_reg.fit(tr_feat, tr_lab)
+        pred, scores = log_reg.predict(ts_feat, True)
+         
+        dra.bayes_error_plot(scores, ts_lab)
     pass
 
-def calibrate_score():
+def svm_bayes_err_plot():
+    features, labels = dl.load_test_data()
+    features = prep.apply_all_preprocess(features)
+    
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )   
+        
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+    
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
+                                          kernel_type="polynomial",
+                                          kernel_grade=2.0, pol_kernel_c=1.0)
+        svm.fit(tr_feat, tr_lab)
+        pred, scores = svm.predict(ts_feat, True)
+         
+        dra.bayes_error_plot(scores, ts_lab)
+    pass
+
+def log_reg_calibrate_score():
     features, labels = dl.load_test_data()
     features = prep.apply_all_preprocess(features)
     
@@ -217,8 +264,68 @@ def calibrate_score():
         
         log_reg = models.LogisticRegression(0, 0.1)
         
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
+        
+        k_scores.append(scores)
+        k_labs.append(ts_lab)
+
+
+    scores = np.hstack(k_scores)
+    scores_labs = np.hstack(k_labs)
+    sampled_s, sampled_slab = cv.shuffle_sample(scores, scores_labs, 2)
+    
+    (tr_scores, tr_slab), (val_scores, val_slab) = cv.train_validation_sets(
+        sampled_s, sampled_slab, 1)
+    
+    scores_count = tr_scores.shape[1]
+    
+    dcfs = np.empty(scores_count)
+    for ti in range(scores_count):
+       t = tr_scores[0][ti]
+       pred_s = (tr_scores >= t).astype(np.int32)
+       cm = dra.confusion_matrix(tr_slab, pred_s)
+       dcfs[ti] = dra.dcf(cm, 0.1, 1, 1)
+    
+    selected_thresh = tr_scores[0, dcfs.argmin()]#
+
+    pred_s = (val_scores >= selected_thresh).astype(np.int32)
+    cm = dra.confusion_matrix(val_slab, pred_s)
+    
+    pred_s_theo = (val_scores >= -np.log(0.1/0.9)).astype(np.int32)
+    cm_t = dra.confusion_matrix(val_slab, pred_s_theo)
+    
+    print("Threorethical threshold dcf: ", dra.dcf(cm_t, 0.1, 1, 1))
+    print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
+    print(selected_thresh)
+    print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
+    pass
+        
+def svm_calibrate_score():
+    features, labels = dl.load_test_data()
+    features = prep.apply_all_preprocess(features)
+    
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+
+    k_scores = []
+    k_labs = []
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )  
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
+        svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
+                                          kernel_type="polynomial",
+                                          kernel_grade=2.0, pol_kernel_c=1.0)
+        
+        svm.fit(tr_feat, tr_lab)
+        pred, scores = svm.predict(ts_feat, True)
         
         k_scores.append(scores)
         k_labs.append(ts_lab)
@@ -248,34 +355,36 @@ def calibrate_score():
     pred_s_theo = (val_scores >= -np.log(0.1/0.9)).astype(np.int32)
     cm_t = dra.confusion_matrix(val_slab, pred_s_theo)
     
-    print("Threorethical threshold dcf: ", dra.dcf(cm_t, 0.1, 1, 1))
+    print("Threorethical threshold", dra.dcf(cm_t, 0.1, 1, 1))
     print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
     print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
-    pass     
+    pass 
 
 def main():
     features, labels = dl.load_test_data()
+    features = prep.apply_all_preprocess(features)
     
-    features = prep.apply_all_preprocess(features)    
-    
-    train_f, train_l = dl.load_train_data()
-    
-    train_f = prep.apply_all_preprocess(train_f)
+    k = 5
+    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
-    
-    gm = models.LogisticRegression(0, 0.1)
-       
-    gm.set_threshold(-0.141)
-
-    gm.fit(train_f, train_l)
-    
-    pred = gm.predict(features)
-    
-    cm = dra.confusion_matrix(labels, pred)
-    
-    print(dra.matthews_corr_coeff(cm))
-
+    k_scores = []
+    k_labs = []
+    for i in range(k):
+        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+            sampled_f, sampled_l, i
+        )  
+        
+        log_reg = models.LogisticRegression(0, 0.1)
+        
+        # tr_feat = prep.gaussianize(tr_feat)
+        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
+        log_reg.fit(tr_feat, tr_lab)
+        pred = log_reg.predict(ts_feat)
+        cm = dra.confusion_matrix(ts_lab, pred)
+        print("MCC: ", dra.matthews_corr_coeff(cm))
+        print("Acc: ", (cm[1, 1] + cm[0, 0])/ts_lab.shape[0])
 
 if __name__ == "__main__":
     main()

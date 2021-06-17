@@ -30,8 +30,8 @@ def calibrate_score():
         
         log_reg = models.LogisticRegression(0, 0.1)
         
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -56,7 +56,7 @@ def calibrate_score():
        cm = dra.confusion_matrix(tr_slab, pred_s)
        dcfs[ti] = dra.dcf(cm, 0.1, 1, 1)
     
-    selected_thresh = tr_scores[0, dcfs.argmin()]
+    selected_thresh = tr_scores[0, dcfs.argmin()]#
 
     pred_s = (val_scores >= selected_thresh).astype(np.int32)
     cm = dra.confusion_matrix(val_slab, pred_s)
@@ -82,7 +82,10 @@ def log_regr_bayes_err_plot():
             sampled_f, sampled_l, i
         )   
     
-        log_reg = models.LogisticRegression(1e-5, 0.1)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
+        log_reg = models.LogisticRegression(0, 0.1)
         
         log_reg.fit(tr_feat, tr_lab)
         pred, scores = log_reg.predict(ts_feat, True)
@@ -201,7 +204,7 @@ def print_min_risk():
     
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
     
-    low_lr = models.LogisticRegression(select_l, 0.1)
+    low_lr = models.LogisticRegression(select_l, 0.5)
     
     min_dcf_1 = np.empty([k , 3])
     min_dcf_5 = np.empty([k , 3])
@@ -212,8 +215,8 @@ def print_min_risk():
             sampled_f, sampled_l, i
         )
         
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = prep.gaussianize(tr_feat)
+        ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         low_lr.fit(tr_feat, tr_lab)
         _, l_scores = low_lr.predict(ts_feat, True)
@@ -228,4 +231,4 @@ def print_min_risk():
 
 
 if __name__ == '__main__':
-    log_regr_roc()    
+    analize_risk()    
