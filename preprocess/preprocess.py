@@ -12,36 +12,51 @@ from dimensionality_reduction import within_class_covariance
 
 sys.path.append("..")
 
+class Preprocessor:
+    
+    def fit_transform(self, features: np.ndarray) -> np.ndarray:
+        self.means = features.mean(axis=1)
+        self.std = features.std(axis=1)
+        self.cov = np.cov(features, bias=True)
+        
+        f = self.center_features(features)
+        f = self.standardize_variance(f)
+        #f = self.whiten_covariance(f)
+        f = self.normalize_lenght(f)
+        
+        return f
 
-def center_features(features: np.ndarray) -> np.ndarray:
-    means = features.mean(axis=1)
-    return features - np.vstack(means)
+    def transform(self, features: np.ndarray) -> np.ndarray:
+        f = self.center_features(features)
+        f = self.standardize_variance(f)
+        #f = self.whiten_covariance(f)
+        f = self.normalize_lenght(f)
+        
+        return f
 
-
-def standardize_variance(features: np.ndarray) -> np.ndarray:
-    variance = features.std(axis=1)
-    return features / np.vstack(variance)
-
-
-def whiten_covariance(features: np.ndarray) -> np.ndarray:
-    cov = np.cov(features, bias=True)
-    eig_vals, eig_vec = np.linalg.eig(cov)
-    uncorrelated = features.T.dot(eig_vec)
-    uncorrelated /= np.sqrt(eig_vals + 1e-5)
-    return uncorrelated.T
-
-
-def normalize_lenght(features: np.ndarray) -> np.ndarray:
-    normalized = np.empty(features.shape)
-    for i in range(features.shape[1]):
-        sample = features[:, i]
-        sample /= np.linalg.norm(sample)
-        normalized[:, i] = sample
-    return normalized
-
-
-def apply_all_preprocess(features: np.ndarray) -> np.ndarray:
-    f = center_features(features)
-    f = standardize_variance(f)
-    f = whiten_covariance(f)
-    return normalize_lenght(f)
+        
+    def center_features(self, features: np.ndarray) -> np.ndarray:
+        return features - np.vstack(self.means)
+    
+    
+    def standardize_variance(self, features: np.ndarray) -> np.ndarray:
+        return features / np.vstack(self.std)
+    
+    
+    def whiten_covariance(self, features: np.ndarray) -> np.ndarray:
+        W = np.sqrt(self.cov)
+        r, n = features.shape
+        uncorrelated = np.empty([r, n])
+        for i in range(n):
+            uncorrelated[:, i] = W.dot(features[:, i])
+        return uncorrelated
+    
+    
+    def normalize_lenght(self, features: np.ndarray) -> np.ndarray:
+        normalized = np.empty(features.shape)
+        for i in range(features.shape[1]):
+            sample = features[:, i]
+            sample /= np.linalg.norm(sample)
+            normalized[:, i] = sample
+        return normalized
+    

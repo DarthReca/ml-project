@@ -9,29 +9,31 @@ import preprocess as prep
     
 def calibrate_score():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-
+    
+    preprocessor = prep.Preprocessor()
+    
     k_scores = []
     k_labs = []
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                           kernel_type="polynomial",
-                                          kernel_grade=2.0, pol_kernel_c=1.0)
+                                          kernel_grade=1.0, pol_kernel_c=1.0)
+        
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
         
         svm.fit(tr_feat, tr_lab)
-        pred, scores = svm.predict(ts_feat, True)
+        pred, scores = svm.predict(val_feat, True)
         
         k_scores.append(scores)
-        k_labs.append(ts_lab)
+        k_labs.append(val_lab)
 
 
     scores = np.hstack(k_scores)
@@ -64,66 +66,76 @@ def calibrate_score():
     print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
     pass 
 
-def svm_bayes_err_plot():
+def bayes_err_plot():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
+
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )   
+    
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
         
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        # val_feat = gaussianizer.gaussianize(val_feat)
     
         svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                           kernel_type="polynomial",
-                                          kernel_grade=2.0, pol_kernel_c=1.0)
+                                          kernel_grade=1.0, pol_kernel_c=1.0)
         svm.fit(tr_feat, tr_lab)
-        pred, scores = svm.predict(ts_feat, True)
+        pred, scores = svm.predict(val_feat, True)
          
-        dra.bayes_error_plot(scores, ts_lab)
+        dra.bayes_error_plot(scores, val_lab)
     pass
 
-def svm_dcf():
+def actual_dcf():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
+
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
 
     dcf_5 = np.empty([k, 2])    
     dcf_1 = np.empty([k, 2])    
     dcf_9 = np.empty([k, 2])    
 
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )   
-    
+        
         svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                           kernel_type="polynomial",
                                           kernel_grade=2.0, pol_kernel_c=1.0)
+        
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
+        
         svm.fit(tr_feat, tr_lab)
-        pred, scores = svm.predict(ts_feat, True)
-        cm = dra.confusion_matrix(ts_lab, pred)
+        pred, scores = svm.predict(val_feat, True)
+        cm = dra.confusion_matrix(val_lab, pred)
         
         dcf_5[i, 0] = dra.dcf(cm, 0.5, 1, 1) 
-        dcf_5[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
+        dcf_5[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
 
         dcf_1[i, 0] = dra.dcf(cm, 0.1, 1, 1) 
-        dcf_1[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
+        dcf_1[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
         
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1)
-        dcf_9[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
+        dcf_9[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
     pass
 
 def svm_roc():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -138,9 +150,6 @@ def svm_roc():
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
         
         cms.append([])
         for j in range(t.shape[0]):
@@ -164,80 +173,93 @@ def plot_risk():
 
 
 def analize_risk_C():
-    features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
+    features, labels = dl.load_test_data()
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     C = np.linspace(1e-3, 1e2, 10)
     # Tested Pol: 1.0, 2.0
-    grade = 2.0
-    # Tested RBF: 0.1, 1.0, 10
-    gamma = 10
+    grade = 100.0
+    
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
 
     low_dcf = np.empty([k, 10])
     norm_dcf = np.empty([k, 10])
     high_dcf = np.empty([k, 10])
 
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-
-        # Not so useful
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
 
         for j in range(10):
             svm = models.SupportVectorMachine(
                 k=1.0, C=C[j], prior_true=0.1, 
                 kernel_grade=grade, pol_kernel_c=1.0,
-                kernel_type="polynomial"
+                kernel_type="radial basis function"
             )
+            
+            tr_feat = preprocessor.fit_transform(tr_feat)
+            val_feat = preprocessor.transform(val_feat)
+            
+            # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+            # val_feat = gaussianizer.gaussianize(val_feat)
+            
             svm.fit(tr_feat, tr_lab)
-            pred, scores = svm.predict(ts_feat, True)
-            low_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
-            norm_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
-            high_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
+            pred, scores = svm.predict(val_feat, True)
+            low_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
+            norm_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
+            high_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
     pass
 
-
-def print_min_risk():
-    features, labels = dl.load_train_data()
-
-    features = prep.apply_all_preprocess(features)
-    grade = 1.0
+def analize_single():
+    features, labels = dl.load_test_data()
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
-    min_dcf_1 = np.empty(k)
-    min_dcf_5 = np.empty(k)
-    min_dcf_9 = np.empty(k)
-    svm = models.SupportVectorMachine(
-        kernel_type="radial basis function",
-        k=1, C=1e-3, prior_true=0.1, kernel_grade=grade, pol_kernel_c=1.0
-    )
+    # Tested Pol: 1.0, 2.0
+    grade = 1.0
+    
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
+
+    low_dcf = np.empty([k])
+    norm_dcf = np.empty([k])
+    high_dcf = np.empty([k])
+
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        # Not so useful
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
 
+        
+        svm = models.SupportVectorMachine(
+            k=1.0, C=1e-3, prior_true=0.5, 
+            kernel_grade=grade, pol_kernel_c=1.0,
+            kernel_type="radial basis function"
+        )
+        
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
+        
+        # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        # val_feat = gaussianizer.gaussianize(val_feat)
+        
         svm.fit(tr_feat, tr_lab)
-        pred, scores = svm.predict(ts_feat, True)
+        pred, scores = svm.predict(val_feat, True)
+        low_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
+        norm_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
+        high_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
+    pass
 
-        min_dcf_1[i] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
-        min_dcf_5[i] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
-        min_dcf_9[i] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
-
-    print("pi_t = 0.1", min_dcf_1.mean(axis=0))
-    print("pi_t = 0.5", min_dcf_5.mean(axis=0))
-    print("pi_t = 0.9", min_dcf_9.mean(axis=0))
-
+def means():
+    print("0.9:", high_dcf[:, 0].mean())
+    print("0.5:", norm_dcf[:, 0].mean())
+    print("0.1:", low_dcf[:,0].mean())
+    
 
 if __name__ == "__main__":
     calibrate_score()

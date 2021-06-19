@@ -17,27 +17,29 @@ import matplotlib.pyplot as plt
 
 def analize_correlation():
     train_features, train_labels = dl.load_train_data()
+    train_features = dr.pca(train_features, 8)
+    
     pcc = np.corrcoef(train_features)
     dp.plot_matrix(pcc, "Greens")
     # Preprocessed
-    preprocessed = prep.apply_all_preprocess(train_features)   
+    preprocessed = prep.Preprocessor().fit_transform(train_features)   
     pcc = np.corrcoef(preprocessed)
     dp.plot_matrix(pcc, "Reds")
     #Gaussianized
-    gaussianized = prep.gaussianize(train_features)
+    gaussianized = prep.Gaussianizer().fit_gaussianize(train_features)
     pcc = np.corrcoef(gaussianized)
     dp.plot_matrix(pcc, "Greens")
     #Preprocessed and Gaussianized
-    gaussianized = prep.gaussianize(preprocessed)
+    gaussianized = prep.Gaussianizer().fit_gaussianize(preprocessed)
     pcc = np.corrcoef(gaussianized)
     dp.plot_matrix(pcc, "Reds")
     
 def analize_class_correlation():
     train_features, train_labels = dl.load_train_data()
-    train_features = prep.apply_all_preprocess(train_features)
+    train_features = prep.Preprocessor().fit_transform(train_features)
     
     pcc = np.corrcoef(train_features[:, train_labels == 1])
-    dp.plot_matrix(pcc, "Blues")
+    dp.plot_matrix(pcc, "Reds")
     
     pcc = np.corrcoef(train_features[:, train_labels == 0])
     dp.plot_matrix(pcc, "Reds")
@@ -49,14 +51,14 @@ def analize_gaussianization():
     # gaussianized = prep.gaussianize(features)
     # dp.plot_attributes(gaussianized, labels)
     
-    preprocessed = prep.apply_all_preprocess(features)
-    # gaussianized = prep.gaussianize(preprocessed)
-    dp.plot_attributes(preprocessed, labels)
+    features = prep.Preprocessor().fit_transform(features)
+    features = prep.Gaussianizer().fit_gaussianize(features)
+    dp.plot_attributes(features, labels)
 
 def analize_features_separation():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
-    
+    features = prep.Preprocessor().fit_transform(features)
+    features = prep.Gaussianizer().fit_gaussianize(features)
     dp.scatter_attributes(features, labels)
 
 
@@ -117,4 +119,4 @@ def analize_rocs():
 
 
 if __name__ == "__main__":
-    analize_gaussianization()
+    analize_correlation()

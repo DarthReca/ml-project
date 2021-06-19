@@ -13,10 +13,14 @@ import models
 import numpy as np
 import preprocess as prep
 import matplotlib.pyplot as plt
+import dimensionality_reduction as dr
  
 def calibrate_score():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
+    
+       
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -24,20 +28,23 @@ def calibrate_score():
     k_scores = []
     k_labs = []
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
         
         log_reg = models.LogisticRegression(0, 0.1)
         
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
+        
+        tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        val_feat = gaussianizer.gaussianize(val_feat)
         
         log_reg.fit(tr_feat, tr_lab)
-        pred, scores = log_reg.predict(ts_feat, True)
+        pred, scores = log_reg.predict(val_feat, True)
         
         k_scores.append(scores)
-        k_labs.append(ts_lab)
+        k_labs.append(val_lab)
 
 
     scores = np.hstack(k_scores)
@@ -70,33 +77,40 @@ def calibrate_score():
     print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
     pass        
 
-def log_regr_bayes_err_plot():
+def bayes_err_plot():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
+    
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )   
-    
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
+        
+        # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        # val_feat = gaussianizer.gaussianize(val_feat)
         
         log_reg = models.LogisticRegression(0, 0.1)
         
         log_reg.fit(tr_feat, tr_lab)
-        pred, scores = log_reg.predict(ts_feat, True)
+        pred, scores = log_reg.predict(val_feat, True)
          
-        dra.bayes_error_plot(scores, ts_lab)
+        dra.bayes_error_plot(scores, val_lab)
     pass
    
 
-def log_regr_dcf():
+def actual_dcf():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
+    
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -105,33 +119,36 @@ def log_regr_dcf():
     dcf_1 = np.empty([k, 2])    
     dcf_9 = np.empty([k, 2])    
     
-    log_regr = models.LogisticRegression(1e-5, 0.1)
+    log_regr = models.LogisticRegression(0, 0.1)
     
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )  
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
+ 
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
+        
+        tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        val_feat = gaussianizer.gaussianize(val_feat)        
         
         log_regr.fit(tr_feat, tr_lab)
         
-        pred, scores = log_regr.predict(ts_feat, True)
-        cm = dra.confusion_matrix(ts_lab, pred)
+        pred, scores = log_regr.predict(val_feat, True)
+        cm = dra.confusion_matrix(val_lab, pred)
         
         dcf_5[i, 0] = dra.dcf(cm, 0.5, 1, 1) 
-        dcf_5[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
+        dcf_5[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
 
         dcf_1[i, 0] = dra.dcf(cm, 0.1, 1, 1) 
-        dcf_1[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
+        dcf_1[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
 
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1) 
-        dcf_9[i, 1] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
+        dcf_9[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
     pass
 
 def log_regr_roc():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -142,8 +159,7 @@ def log_regr_roc():
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+
         cms.append([])
         for j in range(t.shape[0]):
             log_regr.set_threshold(t[j])
@@ -167,68 +183,49 @@ def plot_risk():
 
 def analize_risk():
     features, labels = dl.load_train_data()
-    features = prep.apply_all_preprocess(features)
-        
+    
+    features = dr.pca(features, 8)
+    
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    lams = np.linspace(1e-5, 1e5, 10)
+    lams = np.linspace(0, 1e-4, 10)
+
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
 
     low_dcf = np.empty([k, 10])
     norm_dcf = np.empty([k, 10])
     high_dcf = np.empty([k, 10])
     for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
+        (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
         
-        # Gaussianization doesn't reduce the risk
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        val_feat = preprocessor.transform(val_feat)
+        
+        tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        val_feat = gaussianizer.gaussianize(val_feat)
         
         for j in range(10):
-            log_regr = models.LogisticRegression(lams[j], 0.1)
+            log_regr = models.LogisticRegression(lams[j], 0.1, True)
             log_regr.fit(tr_feat, tr_lab)
-            pred, scores = log_regr.predict(ts_feat, True)
-            low_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
-            norm_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
-            high_dcf[i, j] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
+            pred, scores = log_regr.predict(val_feat, True)
+            low_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
+            norm_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
+            high_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
     pass
 
-def print_min_risk():
-    select_l = 1e-5
-    k = 5
+def means():
+    print("0.9:", high_dcf[:, 0].mean())
+    print("0.5:", norm_dcf[:, 0].mean())
+    print("0.1:", low_dcf[:,0].mean())
+    
+def misc_dcf():
+    print("0.9", (dcf_9[:, 0] - dcf_9[:, 1]).mean())
+    print("0.5", (dcf_5[:, 0] - dcf_5[:, 1]).mean())
+    print("0.1", (dcf_1[:, 0] - dcf_1[:, 1]).mean())
 
-    features, labels = dl.load_train_data()
-    # Some benefits only for pi = 0.9
-    # features = prep.apply_all_preprocess(features)
     
-    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    
-    low_lr = models.LogisticRegression(select_l, 0.5)
-    
-    min_dcf_1 = np.empty([k , 3])
-    min_dcf_5 = np.empty([k , 3])
-    min_dcf_9 = np.empty([k , 3])
-    
-    for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
-            sampled_f, sampled_l, i
-        )
-        
-        tr_feat = prep.gaussianize(tr_feat)
-        ts_feat = prep.gaussianize(ts_feat, tr_feat)
-        
-        low_lr.fit(tr_feat, tr_lab)
-        _, l_scores = low_lr.predict(ts_feat, True)
-        
-        # print("pi_t = 0.1")
-        min_dcf_1[i, 0] = dra.min_norm_dcf(l_scores, ts_lab, 0.1, 1, 1)
-        min_dcf_1[i, 1] = dra.min_norm_dcf(l_scores, ts_lab, 0.5, 1, 1)
-        min_dcf_1[i, 2] = dra.min_norm_dcf(l_scores, ts_lab, 0.9, 1, 1)
-        
-    print("pi_t = 0.1")
-    print("0.1, 0.5, 0.9", min_dcf_1.mean(axis=0))
-
-
 if __name__ == '__main__':
-    analize_risk()    
+    calibrate_score()    

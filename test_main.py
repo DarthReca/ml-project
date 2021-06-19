@@ -15,7 +15,6 @@ import numpy as np
 
 def gaussian_min_dcf():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
     
     s_f, s_l = cv.shuffle_sample(features, labels, 5)
     
@@ -23,14 +22,13 @@ def gaussian_min_dcf():
     low_dcf = np.empty(5)
     high_dcf = np.empty(5)
     
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
     
     model = models.GaussianModel(0.0)
     for i in range(5):
         (tr_feat, tr_lab), (val_feat, val_lab) = cv.train_validation_sets(s_f, s_l, i)
         
-        # Gaussianization doesn't reduce the risk
-        tr_feat = prep.gaussianize(tr_feat)
-        val_feat = prep.gaussianize(val_feat, tr_feat)
         
         model.set_prior(0.1)
         model.fit(tr_feat, tr_lab, tied_cov=True)
@@ -51,7 +49,6 @@ def log_reg_min_dcf():
     k = 5
 
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
     
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
     
@@ -81,7 +78,6 @@ def log_reg_min_dcf():
 def svm_min_dcf():
     features, labels = dl.load_test_data()
 
-    features = prep.apply_all_preprocess(features)
     grade = 10.0
 
     k = 5
@@ -119,8 +115,6 @@ def svm_min_dcf():
 def gmm_min_dcf():
     train_features, train_labels = dl.load_test_data()
     
-    # train_features = prep.apply_all_preprocess(train_features)
-
     s_f, s_l = cv.shuffle_sample(train_features, train_labels, 5)
     
     norm_dcf = np.empty(5)
@@ -150,7 +144,6 @@ def gmm_min_dcf():
 
 def log_regr_lambda_estimation():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -179,7 +172,6 @@ def log_regr_lambda_estimation():
 
 def log_regr_roc():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
         
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -203,7 +195,6 @@ def log_regr_roc():
 
 def log_regr_bayes_err_plot():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -226,7 +217,6 @@ def log_regr_bayes_err_plot():
 
 def svm_bayes_err_plot():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -250,7 +240,6 @@ def svm_bayes_err_plot():
 
 def log_reg_calibrate_score():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -306,7 +295,6 @@ def log_reg_calibrate_score():
         
 def svm_calibrate_score():
     features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
     
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -362,29 +350,25 @@ def svm_calibrate_score():
     pass 
 
 def main():
-    features, labels = dl.load_test_data()
-    features = prep.apply_all_preprocess(features)
+    train_f, train_l = dl.load_train_data()
+    test_f, test_l = dl.load_test_data()
     
-    k = 5
-    sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-
-    k_scores = []
-    k_labs = []
-    for i in range(k):
-        (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
-            sampled_f, sampled_l, i
-        )  
-        
-        log_reg = models.LogisticRegression(0, 0.1)
-        
-        # tr_feat = prep.gaussianize(tr_feat)
-        # ts_feat = prep.gaussianize(ts_feat, tr_feat)
-        
-        log_reg.fit(tr_feat, tr_lab)
-        pred = log_reg.predict(ts_feat)
-        cm = dra.confusion_matrix(ts_lab, pred)
-        print("MCC: ", dra.matthews_corr_coeff(cm))
-        print("Acc: ", (cm[1, 1] + cm[0, 0])/ts_lab.shape[0])
+    preprocessor = prep.Preprocessor()
+    gaussianizer = prep.Gaussianizer()
+    
+    train_f = preprocessor.fit_transform(train_f)
+    test_f = preprocessor.transform(test_f)
+    
+    train_f = gaussianizer.fit_gaussianize(train_f)
+    test_f = gaussianizer.gaussianize(test_f)
+    
+    lr = models.LogisticRegression(0, 0.1)
+    lr.fit(train_f, train_l)
+    pred = lr.predict(test_f)
+    
+    cm = dra.confusion_matrix(test_l, pred)
+    
+    print(dra.matthews_corr_coeff(cm))
 
 if __name__ == "__main__":
     main()

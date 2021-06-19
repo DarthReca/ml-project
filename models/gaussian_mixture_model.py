@@ -162,7 +162,7 @@ class GaussianMixtureModel:
 
         gmm_1 = [(1.0, mean, cov)]
 
-        for _ in range(int(num_gaussians / 2)):
+        for _ in range(int(np.log2(num_gaussians))):
             gmm = []
             for p in gmm_1:
                 w = p[0] / 2
