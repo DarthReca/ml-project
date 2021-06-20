@@ -149,17 +149,26 @@ def actual_dcf():
 
 def log_regr_roc():
     features, labels = dl.load_train_data()
-        
+    
+    gaussianizer = prep.Gaussianizer()
+    preprocessor = prep.Preprocessor()
+   
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    t = np.linspace(-9, 1, 20)
+    t = np.linspace(-12, 7, 20)
     log_regr = models.LogisticRegression(0, 0.1)
     cms = []
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-
+        
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        ts_feat = preprocessor.transform(ts_feat)
+        
+        # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        # ts_feat = gaussianizer.gaussianize(ts_feat)
+        
         cms.append([])
         for j in range(t.shape[0]):
             log_regr.set_threshold(t[j])
@@ -184,11 +193,9 @@ def plot_risk():
 def analize_risk():
     features, labels = dl.load_train_data()
     
-    features = dr.pca(features, 8)
-    
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
-    lams = np.linspace(0, 1e-4, 10)
+    lams = np.linspace(1e-5, 1e5, 10)
 
     gaussianizer = prep.Gaussianizer()
     preprocessor = prep.Preprocessor()
@@ -204,8 +211,8 @@ def analize_risk():
         tr_feat = preprocessor.fit_transform(tr_feat)
         val_feat = preprocessor.transform(val_feat)
         
-        tr_feat = gaussianizer.fit_gaussianize(tr_feat)
-        val_feat = gaussianizer.gaussianize(val_feat)
+        # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        # val_feat = gaussianizer.gaussianize(val_feat)
         
         for j in range(10):
             log_regr = models.LogisticRegression(lams[j], 0.1, True)
@@ -228,4 +235,4 @@ def misc_dcf():
 
     
 if __name__ == '__main__':
-    calibrate_score()    
+    plot_risk()    

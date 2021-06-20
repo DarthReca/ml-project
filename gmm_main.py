@@ -24,7 +24,7 @@ def analize_risk():
     
     gaussianizer = prep.Gaussianizer()
     preprocessor = prep.Preprocessor()
-    n = 8
+    n = 64
     
 
     for i in range(5):
@@ -35,8 +35,8 @@ def analize_risk():
         tr_feat = preprocessor.fit_transform(tr_feat)
         val_feat = preprocessor.transform(val_feat)
         
-        tr_feat = gaussianizer.fit_gaussianize(tr_feat)
-        val_feat = gaussianizer.gaussianize(val_feat)
+        # tr_feat = gaussianizer.fit_gaussianize(tr_feat)
+        # val_feat = gaussianizer.gaussianize(val_feat)
             
         model.set_prior(0.1)
         model.fit(tr_feat, tr_lab, n, 2)

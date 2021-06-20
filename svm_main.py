@@ -136,6 +136,7 @@ def actual_dcf():
 
 def svm_roc():
     features, labels = dl.load_train_data()
+    preprocessor = prep.Preprocessor()
 
     k = 5
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
@@ -145,12 +146,13 @@ def svm_roc():
     
     svm = models.SupportVectorMachine(k=1.0, C=1e-3, prior_true=0.1,
                                       kernel_type="polynomial",
-                                      kernel_grade=2, pol_kernel_c=1.0)
+                                      kernel_grade=1.0, pol_kernel_c=1.0)
     for i in range(k):
         (tr_feat, tr_lab), (ts_feat, ts_lab) = cv.train_validation_sets(
             sampled_f, sampled_l, i
         )
-        
+        tr_feat = preprocessor.fit_transform(tr_feat)
+        ts_feat = preprocessor.transform(ts_feat)
         cms.append([])
         for j in range(t.shape[0]):
             svm.set_threshold(t[j])
@@ -221,7 +223,7 @@ def analize_single():
     sampled_f, sampled_l = cv.shuffle_sample(features, labels, k)
 
     # Tested Pol: 1.0, 2.0
-    grade = 1.0
+    grade = 0.01
     
     gaussianizer = prep.Gaussianizer()
     preprocessor = prep.Preprocessor()
@@ -237,7 +239,7 @@ def analize_single():
 
         
         svm = models.SupportVectorMachine(
-            k=1.0, C=1e-3, prior_true=0.5, 
+            k=1.0, C=1e-3, prior_true=0.1, 
             kernel_grade=grade, pol_kernel_c=1.0,
             kernel_type="radial basis function"
         )
@@ -262,4 +264,4 @@ def means():
     
 
 if __name__ == "__main__":
-    calibrate_score()
+    means()
