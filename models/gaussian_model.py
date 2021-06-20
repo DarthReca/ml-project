@@ -35,6 +35,9 @@ class GaussianModel:
         """
         self.threshold = threshold
 
+    def set_prior(self, prior: float) -> None:
+        self.threshold = -np.log(prior/(1 - prior))
+
     def set_threshold(self, threshold: float) -> None:
         """
         Set threshold for model.
@@ -136,8 +139,8 @@ class GaussianModel:
 
         """
         likelihood = self._log_likelihood(features)
-        ratio = likelihood[1, :] / likelihood[0, :]
-        prediction = (ratio > self.threshold).astype(np.int32)
+        ratio = likelihood[1, :] - likelihood[0, :]
+        prediction = (ratio >= self.threshold).astype(np.int32)
         if return_scores:
             return prediction, ratio
         return prediction

@@ -98,9 +98,30 @@ def min_norm_dcf(
     return min(risks)
 
 
-def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
+def bayes_error_plot(
+    scores: np.ndarray,
+    true_labels: np.ndarray,
+    range_values: Tuple[float, float] = (0, 0),
+) -> None:
+    """
+    Show bayes errors plot.
 
-    prior_log_odds = np.linspace(-scores.max(), scores.max(), 20)
+    Parameters
+    ----------
+    scores : np.ndarray
+        Scores obtained through a model.
+    true_labels : np.ndarray
+        Real labels.
+    range_values : Tuple[float, float], optional
+        The range of prior log odds to plot. The default is (0, 0).
+    """
+    max_value = range_values[1]
+    min_value = range_values[0]
+    if range_values == (0, 0):
+        max_value = scores.max()
+        min_value = scores.min()
+    prior_log_odds = -np.linspace(min_value, max_value, 20)
+    
     dcfs = []
     min_dcfs = []
     priors = []
@@ -108,7 +129,7 @@ def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
     for t in prior_log_odds:
         prior = 1 / (1 + np.exp(-t))
         priors.append(prior)
-        pred = (scores > t).astype(int)
+        pred = (scores > -t).astype(int)
         cm = confusion_matrix(true_labels, pred)
         dcfs.append(dcf(cm, prior, 1, 1))
         min_dcfs.append(min_norm_dcf(scores, true_labels, prior, 1, 1))
@@ -117,5 +138,8 @@ def bayes_error_plot(scores: np.ndarray, true_labels: np.ndarray) -> None:
     plt.plot(prior_log_odds, min_dcfs, label="min DCF", color="b")
     plt.xlabel("Prior log odds")
     plt.ylabel("DCF")
+
+    plt.xticks(prior_log_odds, rotation="vertical")
+
     plt.legend()
     plt.show()

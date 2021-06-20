@@ -2,25 +2,44 @@
 
 ## Modules
 
-**data_loading**: Load test data and training data
-
-**data_plotting**: It contains function to plot data in various way
-
-**models**: It contains all classes of models
-
-## Notes
+- cross_validation
+- data_loading
+- data_plotting
+- data_result_analysis
+- dimensionality_reduction
+- models
+- preprocess
 
 ### Cross Validation
 
-- Overfitting or Underfitting can be good ([Shiring](https://shiring.github.io/machine_learning/2017/04/02/unbalanced))
+Utilities function to do cross validation
 
-### Gaussian Model
+### data_loading
 
-- After preprocessing can be obtained better results (~0.4 accuracy)
-- Data of pulsar and non-pulsar are not well separated
-- Linear models will not achieve good result because they are not linearly separable
-- Preprocessed data are more or less a Gaussian
+Utilities function to load training data and test data
 
-### Linear Regression
+### data_plotting
 
-### Support Vector Machine
+Functions to plot scatter, histograms and heat-maps
+
+### data_result_analysis
+
+ Functions to compute:
+
+- scalar metrics (precision, F-beta-score, Matthews Correlation Coefficient)
+- confusion matrix
+- minimum DCF and DCF
+- ROC, DET
+- Bayes error plot
+
+### dimensionality_reduction
+
+Function to compute LDA and PCA
+
+### models
+
+Classes for different ML models
+
+### preprocess
+
+Classes to gaussianize and preprocess data

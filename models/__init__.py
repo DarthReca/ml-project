@@ -1,3 +1,4 @@
 from .gaussian_model import GaussianModel
 from .logistic_regression import LogisticRegression
 from .support_vector_machine import SupportVectorMachine
+from .gaussian_mixture_model import GaussianMixtureModel

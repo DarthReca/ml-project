@@ -39,9 +39,8 @@ def plot_attributes(features: np.ndarray, labels: np.ndarray) -> None:
         _, bins = np.histogram(features[i, :], bins=35)
         # red color to show false prediction
         ax[i].hist(wrong[i, :], bins=bins, color="r", alpha=0.2)
-        # blue color to show true prediction
+        # green color to show true prediction
         ax[i].hist(pulsar[i, :], bins=bins, color="b", alpha=0.5)
-        ax[i].set_title(dl.labels_names[i])
         # ax[i].axis(ymax=200)
         ax[i].autoscale_view(True)
 
@@ -62,8 +61,9 @@ def scatter_attributes(features: np.ndarray, labels: np.ndarray) -> None:
 
     """
     features_count = features.shape[0]
+    combinations = list(it.combinations(range(features_count), 2))
 
-    for c in list(it.combinations(range(features_count), 2)):
+    for c in combinations:
         _, ax = plt.subplots()
 
         true_features = features[:, labels == 1]
@@ -86,8 +86,8 @@ def scatter_attributes(features: np.ndarray, labels: np.ndarray) -> None:
             facecolors="none",
         )
 
-        #ax.set_xlabel(dl.labels_names[c[0]])
-        #ax.set_ylabel(dl.labels_names[c[1]])
+        # ax.set_xlabel(dl.labels_names[c[0]])
+        # ax.set_ylabel(dl.labels_names[c[1]])
 
         ax.legend()
         ax.autoscale_view(True)

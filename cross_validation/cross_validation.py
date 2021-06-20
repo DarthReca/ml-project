@@ -33,15 +33,38 @@ def shuffle_sample(
 
     """
     dataset = np.vstack([features, labels])
+    
+    positive_samples = dataset[:, dataset[-1] == 1]
+    negative_samples = dataset[:, dataset[-1] == 0]
+    
+    pos_perc = positive_samples.shape[1]/dataset.shape[1]
+    
     rng = np.random.default_rng()
-    rng.shuffle(dataset, axis=1)
+    rng.shuffle(positive_samples, axis=1)
+    rng.shuffle(negative_samples, axis=1)
 
     s_features = []
     s_labels = []
-    sample_size = int(features.shape[1] / samples)
+    
+    sample_size = int(features.shape[0] / samples)
+    if len(features.shape) > 1:
+        sample_size = int(features.shape[1] / samples)
+    
+    positive_size = int(sample_size * pos_perc)
+    negative_size = sample_size - positive_size
+    
     for i in range(samples):
-        start = i * sample_size
-        s = dataset[:, start: (start + sample_size)]
+        start_positive = i * positive_size
+        start_negative = i * negative_size
+        
+        end_positive = start_positive + positive_size
+        end_negative = start_negative + negative_size
+        
+        ps = positive_samples[:, start_positive: end_positive]
+        ns = negative_samples[:, start_negative: end_negative]
+        
+        s = np.hstack([ps, ns])
+        
         s_features.append(s[:-1])
         s_labels.append(s[-1].astype(np.int32))
 
@@ -51,6 +74,24 @@ def shuffle_sample(
 def train_validation_sets(
     sampled_f: np.ndarray, sampled_l: np.ndarray, validation_index: int
 ) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
+    """
+    Merge samples to obtain train and validation sets.
+
+    Parameters
+    ----------
+    sampled_f : np.ndarray
+        sampled feautures obtained from `shuffle sample`.
+    sampled_l : np.ndarray
+        sampled labels obtained from `shuffle_sample`.
+    validation_index : int
+        index of the validation set.
+
+    Returns
+    -------
+    (tr_set, val_set)
+        Each set is a tuple with features and labels.
+
+    """    
     val_feat = sampled_f[validation_index]
     val_lab = sampled_l[validation_index]
     samples = len(sampled_f)
