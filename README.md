@@ -1,5 +1,9 @@
 # Machine Learning Project
 
+## Description
+
+This project was built during the course of _Machine Learning and Pattern Recognition_ at Polytechnic University of Turin. The purpose was to build models and tools to analize the dataset **HTRU2** (_R. J. Lyon, B. W. Stappers, S. Cooper, J. M. Brooke, J. D. Knowles, Fifty Years of Pulsar Candidate Selection: From simple filters to a new principled real-time classification approach, Monthly Notices of the Royal Astronomical Society 459 (1), 1104-1123, DOI: 10.1093/mnras/stw656_)
+
 ## Modules
 
 - cross_validation
@@ -24,7 +28,7 @@ Functions to plot scatter, histograms and heat-maps
 
 ### data_result_analysis
 
- Functions to compute:
+Functions to compute:
 
 - scalar metrics (precision, F-beta-score, Matthews Correlation Coefficient)
 - confusion matrix
