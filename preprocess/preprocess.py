@@ -8,6 +8,7 @@ Created on Sat May 22 19:24:09 2021
 import sys
 
 import numpy as np
+
 from dimensionality_reduction import within_class_covariance
 
 sys.path.append("..")

@@ -5,12 +5,12 @@ Created on Thu May  6 08:59:17 2021
 @author: DarthReca
 """
 
-from typing import List, Tuple
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .confusion_matrix import confusion_matrix, tpr_fnr, tnr_fpr
+from .confusion_matrix import confusion_matrix, tnr_fpr, tpr_fnr
 
 
 def thresholds_error_rates(

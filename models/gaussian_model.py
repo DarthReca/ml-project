@@ -8,9 +8,10 @@ Created on Thu May  6 19:14:45 2021
 import sys
 from typing import Tuple, Union
 
+import numpy as np
+
 import data_result_analysis as dra
 import dimensionality_reduction as dr
-import numpy as np
 
 sys.path.append("..")
 

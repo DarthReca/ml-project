@@ -5,15 +5,16 @@ Created on Sat May 29 17:45:45 2021
 @author: DarthReca
 """
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 import cross_validation as cv
 import data_loading as dl
 import data_plotting as pt
 import data_result_analysis as dra
-import models
-import numpy as np
-import preprocess as prep
-import matplotlib.pyplot as plt
 import dimensionality_reduction as dr
+import models
+import preprocess as prep
 
 
 def calibrate_score():
@@ -75,7 +76,6 @@ def calibrate_score():
     print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
     print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
-    pass
 
 
 def bayes_err_plot():
@@ -104,7 +104,6 @@ def bayes_err_plot():
         pred, scores = log_reg.predict(val_feat, True)
 
         dra.bayes_error_plot(scores, val_lab)
-    pass
 
 
 def actual_dcf():
@@ -146,7 +145,6 @@ def actual_dcf():
 
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1)
         dcf_9[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
 
 
 def log_regr_roc():
@@ -178,7 +176,6 @@ def log_regr_roc():
             pred, score = log_regr.predict(ts_feat, True)
             cms[i].append(dra.confusion_matrix(ts_lab, pred))
         dra.roc_det_curves(cms[i])
-    pass
 
 
 def plot_risk():
@@ -224,7 +221,6 @@ def analize_risk():
             low_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
             norm_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
             high_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
 
 
 def means():

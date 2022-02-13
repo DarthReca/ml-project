@@ -1,12 +1,14 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 import cross_validation as cv
 import data_loading as dl
 import data_plotting as pt
 import data_result_analysis as dra
-import matplotlib.pyplot as plt
 import models
-import numpy as np
-import preprocess as prep  
-    
+import preprocess as prep
+
+
 def calibrate_score():
     features, labels = dl.load_train_data()
     
@@ -64,7 +66,6 @@ def calibrate_score():
     print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
     print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
-    pass 
 
 def bayes_err_plot():
     features, labels = dl.load_train_data()
@@ -93,7 +94,6 @@ def bayes_err_plot():
         pred, scores = svm.predict(val_feat, True)
          
         dra.bayes_error_plot(scores, val_lab)
-    pass
 
 def actual_dcf():
     features, labels = dl.load_train_data()
@@ -132,7 +132,6 @@ def actual_dcf():
         
         dcf_9[i, 0] = dra.dcf(cm, 0.9, 1, 1)
         dcf_9[i, 1] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
 
 def svm_roc():
     features, labels = dl.load_train_data()
@@ -160,7 +159,6 @@ def svm_roc():
             pred, scores = svm.predict(ts_feat, True)
             cms[i].append(dra.confusion_matrix(ts_lab, pred))
         dra.roc_det_curves(cms[i])
-    pass
 
 def plot_risk():
     fig, ax = plt.subplots()
@@ -214,7 +212,6 @@ def analize_risk_C():
             low_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
             norm_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
             high_dcf[i, j] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
 
 def analize_single():
     features, labels = dl.load_test_data()
@@ -255,7 +252,6 @@ def analize_single():
         low_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
         norm_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
         high_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
 
 def means():
     print("0.9:", high_dcf[:, 0].mean())

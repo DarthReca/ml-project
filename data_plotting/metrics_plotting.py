@@ -6,8 +6,9 @@ Created on Sun May 30 22:08:39 2021
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
 import numpy as np
+from matplotlib.colors import ListedColormap
+
 
 def plot_matrix(matrix: np.ndarray, colormap: str) -> None:
     """

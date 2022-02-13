@@ -204,7 +204,6 @@ class GaussianMixtureModel:
             curr = features[:, labels == l]
             params = self._lbg(curr, num_gaussians)
             self.gaussian_mixtures.append(params)
-        pass
 
     def predict(
         self, features: np.ndarray, return_scores: bool = False

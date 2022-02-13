@@ -5,13 +5,15 @@ Created on Wed Jun  9 20:49:03 2021
 @author: DarthReca
 """
 
+import numpy as np
+
 import cross_validation as cv
 import data_loading as dl
 import data_plotting as pt
 import data_result_analysis as dra
 import models
-import numpy as np
 import preprocess as prep
+
 
 def analize_risk():
     train_features, train_labels = dl.load_train_data()
@@ -45,7 +47,6 @@ def analize_risk():
         norm_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.5, 1, 1)
         low_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.1, 1, 1)
         high_dcf[i] = dra.min_norm_dcf(scores, val_lab, 0.9, 1, 1)
-    pass
 
 def means():
     print("0.9:", high_dcf.mean())

@@ -8,9 +8,10 @@ Created on Mon May  3 17:58:53 2021
 import itertools as it
 import sys
 
-import data_loading as dl
 import matplotlib.pyplot as plt
 import numpy as np
+
+import data_loading as dl
 
 sys.path.append("..")
 

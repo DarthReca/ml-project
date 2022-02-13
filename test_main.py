@@ -5,13 +5,15 @@ Created on Fri May 21 15:19:54 2021
 @author: DarthReca
 """
 
+import numpy as np
+
+import cross_validation as cv
 import data_loading as dl
+import data_plotting as dp
+import data_result_analysis as dra
 import models
 import preprocess as prep
-import data_result_analysis as dra
-import data_plotting as dp
-import cross_validation as cv
-import numpy as np
+
 
 def gaussian_min_dcf():
     ts_feat, ts_lab = dl.load_test_data()
@@ -146,7 +148,6 @@ def log_regr_lambda_estimation():
         low_dcf[0, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
         norm_dcf[0, j] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
         high_dcf[0, j] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
-    pass
 
 def svm_C_estimation():
     
@@ -176,7 +177,6 @@ def svm_C_estimation():
         low_dcf[0, j] = dra.min_norm_dcf(scores, ts_lab, 0.1, 1, 1)
         norm_dcf[0, j] = dra.min_norm_dcf(scores, ts_lab, 0.5, 1, 1)
         high_dcf[0, j] = dra.min_norm_dcf(scores, ts_lab, 0.9, 1, 1)
-    pass
 
 def bayes_errors_plot():
     ts_feat, ts_lab = dl.load_test_data()
@@ -250,7 +250,6 @@ def calibrate_score():
     print("Actual threshold dcf:", dra.dcf(cm, 0.1, 1, 1))
     print(selected_thresh)
     print(dra.min_norm_dcf(val_scores[0], val_slab, 0.1, 1, 1))
-    pass
 
 def main():
     train_f, train_l = dl.load_train_data()

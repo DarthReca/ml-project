@@ -8,6 +8,7 @@ Created on Sat May 29 18:11:10 2021
 import numpy as np
 from scipy.stats import norm
 
+
 class Gaussianizer:
     
     def fit_gaussianize(self, features: np.ndarray) -> np.ndarray:

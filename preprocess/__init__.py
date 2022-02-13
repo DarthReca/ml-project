@@ -1,2 +1,2 @@
-from .preprocess import Preprocessor
 from .gaussianization import Gaussianizer
+from .preprocess import Preprocessor
