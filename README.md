@@ -96,7 +96,7 @@ If you want to improve something feel free to fork or submit some merge request.
 
 ## Authors & contributors
 
-For a full list of all authors and contributors, see [the contributors page](https://gitlab.com/DarthReca/machine-learning-project/-/project_members).
+For a full list of all authors and contributors, see [the contributors page](https://gitlab.com/DarthReca/machine-learning-project/-/graphs/master).
 
 ## License
 
