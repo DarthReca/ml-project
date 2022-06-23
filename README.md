@@ -22,6 +22,8 @@
 
 ## About
 
+**This is a port of the original one that can be found on [GitLab](https://gitlab.com/DarthReca/machine-learning-project)**
+
 This project was built during the course of _Machine Learning and Pattern Recognition_ at Polytechnic University of Turin. The purpose was to build models and tools to analize the dataset **HTRU2** (_R. J. Lyon, B. W. Stappers, S. Cooper, J. M. Brooke, J. D. Knowles, Fifty Years of Pulsar Candidate Selection: From simple filters to a new principled real-time classification approach, Monthly Notices of the Royal Astronomical Society 459 (1), 1104-1123, DOI: 10.1093/mnras/stw656_)
 
 ## Getting Started
